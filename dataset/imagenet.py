@@ -1,6 +1,6 @@
 import os
 import shutil
-
+import torch
 from torchvision.datasets import ImageFolder
 import torchvision.transforms as T
 
@@ -28,3 +28,12 @@ def _get_imagenet_datasets():
     tiny_imagenet_dataset_train = ImageFolder(root='tiny-imagenet/tiny-imagenet-200/train', transform=transform)
     tiny_imagenet_dataset_val = ImageFolder(root='tiny-imagenet/tiny-imagenet-200/val', transform=transform)
     return tiny_imagenet_dataset_train, tiny_imagenet_dataset_val
+
+
+def get_imagenet_dataloaders():
+
+    tiny_imagenet_dataset_train, tiny_imagenet_dataset_val = _get_imagenet_datasets()
+    train_loader = torch.utils.data.DataLoader(tiny_imagenet_dataset_train, batch_size=64, shuffle=True)
+    # shuffle set to True for train while we keep natural order for validation and test
+    val_loader = torch.utils.data.DataLoader(tiny_imagenet_dataset_val, batch_size=64, shuffle=False)
+    return train_loader, val_loader
