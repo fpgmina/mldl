@@ -6,7 +6,7 @@ import torchvision.transforms as T
 
 
 def _download_dataset():
-
+    # We need to adjust the format of the val split of the dataset to be used with ImageFolder.
     with open('tiny-imagenet/tiny-imagenet-200/val/val_annotations.txt') as f:
         for line in f:
             fn, cls, *_ = line.split('\t')
@@ -31,7 +31,7 @@ def _get_imagenet_datasets():
 
 
 def get_imagenet_dataloaders():
-
+    _download_dataset()
     tiny_imagenet_dataset_train, tiny_imagenet_dataset_val = _get_imagenet_datasets()
     train_loader = torch.utils.data.DataLoader(tiny_imagenet_dataset_train, batch_size=64, shuffle=True)
     # shuffle set to True for train while we keep natural order for validation and test
