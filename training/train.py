@@ -76,7 +76,7 @@ def train_model(
     assert isinstance(val_loader, torch.utils.data.DataLoader)
 
     wandb.init(
-        project="mldl_lab4",
+        project="mldl_lab3",
         name=training_params.training_name,
         config={
             "epochs": training_params.epochs,

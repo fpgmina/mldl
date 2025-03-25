@@ -9,7 +9,7 @@ from training.train_params import TrainingParams
 if __name__ == "__main__":
 
     training_params = TrainingParams(
-        training_name="cnn-training_refactor",
+        training_name="cnn-training_refactor_data",
         epochs=10,
         learning_rate=0.001,
         model=CustomNet(),
