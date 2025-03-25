@@ -1,7 +1,11 @@
+import os
 import torch
 from torch import nn
 import wandb
 from training.train_params import TrainingParams
+
+
+os.environ["WANDB_MODE"] = "online"
 
 
 def _train(
@@ -37,8 +41,7 @@ def _train(
 
     # Log training metrics to wandb
     wandb.log(
-        {"Train Loss": train_loss, "Train Accuracy": train_accuracy, "epoch": epoch}
-    )
+        {"Epoch": epoch, "Train Loss": train_loss, "Train Accuracy": train_accuracy})
 
 
 def _validate(
@@ -103,10 +106,10 @@ def train_model(
 
         # Log validation metrics to wandb
         wandb.log(
-            {
+            {   
+                "Epoch": epoch,
                 "Validation Loss": val_loss,
                 "Validation Accuracy": val_accuracy,
-                "epoch": epoch,
             }
         )
 
