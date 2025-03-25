@@ -41,7 +41,8 @@ def _train(
 
     # Log training metrics to wandb
     wandb.log(
-        {"Epoch": epoch, "Train Loss": train_loss, "Train Accuracy": train_accuracy})
+        {"Epoch": epoch, "Train Loss": train_loss, "Train Accuracy": train_accuracy}
+    )
 
 
 def _validate(
@@ -106,7 +107,7 @@ def train_model(
 
         # Log validation metrics to wandb
         wandb.log(
-            {   
+            {
                 "Epoch": epoch,
                 "Validation Loss": val_loss,
                 "Validation Accuracy": val_accuracy,

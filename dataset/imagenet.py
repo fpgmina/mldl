@@ -11,7 +11,6 @@ import zipfile
 __all__ = ["get_imagenet_dataloaders"]
 
 
-
 def _is_dataset_valid():
     """Check if the dataset exists and is in the correct format."""
     dataset_path = "tiny-imagenet/tiny-imagenet-200"
@@ -47,7 +46,7 @@ def _download_and_extract():
 
         # Unzip the downloaded file
         print("Extracting dataset...")
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(dataset_path)
         print("Extraction completed.")
 
@@ -55,7 +54,6 @@ def _download_and_extract():
         os.remove(zip_path)
     else:
         print(f"{dataset_path} already exists. Skipping download and extraction.")
-
 
 
 def _adjust_validation_format():
