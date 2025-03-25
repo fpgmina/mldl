@@ -30,10 +30,10 @@ def _get_imagenet_datasets():
     return tiny_imagenet_dataset_train, tiny_imagenet_dataset_val
 
 
-def get_imagenet_dataloaders():
+def get_imagenet_dataloaders(batch_size: int):
     _download_dataset()
     tiny_imagenet_dataset_train, tiny_imagenet_dataset_val = _get_imagenet_datasets()
-    train_loader = torch.utils.data.DataLoader(tiny_imagenet_dataset_train, batch_size=64, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(tiny_imagenet_dataset_train, batch_size=batch_size, shuffle=True)
     # shuffle set to True for train while we keep natural order for validation and test
-    val_loader = torch.utils.data.DataLoader(tiny_imagenet_dataset_val, batch_size=64, shuffle=False)
+    val_loader = torch.utils.data.DataLoader(tiny_imagenet_dataset_val, batch_size=batch_size, shuffle=False)
     return train_loader, val_loader
