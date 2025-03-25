@@ -78,7 +78,7 @@ def train_model(train_loader: torch.utils.data.DataLoader, val_loader: torch.uti
             "batch_size": train_loader.batch_size,
             "learning_rate": training_params.learning_rate,
             "architecture": training_params.model.__class__.__name__,
-            "optimizer": training_params.optimizer.__name__,
+            "optimizer_class": training_params.optimizer.__name__,
             "loss_function": training_params.loss_function.__name__,
             **training_params.optimizer_params,
         }

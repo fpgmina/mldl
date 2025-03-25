@@ -12,13 +12,17 @@ if __name__ == "__main__":
         training_name="cnn-training_refactor", 
         epochs=10, 
         learning_rate=0.001, 
-        architecture=CustomNet, 
-        optimizer=torch.optim.Adam,
-        loss_function=nn.CrossEntropyLoss,
+        model=CustomNet(), 
+        optimizer_class=torch.optim.Adam,
+        loss_function=nn.CrossEntropyLoss(),
         )
 
     train_loader, val_loader = get_imagenet_dataloaders(batch_size=32)
-    train_model(train_loader=train_loader, val_loader=val_loader, training_params=training_params)
+    train_model(
+        train_loader=train_loader, 
+        val_loader=val_loader, 
+        training_params=training_params
+        )
     
 
 

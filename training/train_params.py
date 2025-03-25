@@ -27,8 +27,8 @@ class TrainingParams:
         training_name (str): A name for the training experiment.
         epochs (int): The number of epochs for training.
         learning_rate (float): The learning rate for the optimizer.
-        architecture (nn.Module): The model architecture to be trained.
-        optimizer (torch.optim.Optimizer): The optimizer to be used for training.
+        model (nn.Module): The model to be trained.
+        optimizer_class (torch.optim.Optimizer): The class of the optimizer to be used for training.
         loss_function (nn.Module): The loss function to be used.
         optimizer_params (Optional[Dict[str, Any]]): A dictionary of additional optimizer parameters (optional).
     """
@@ -42,4 +42,8 @@ class TrainingParams:
 
     @property
     def optimizer(self):
-        return self._optimizer_class(self.model.parameters(), lr=self.learning_rate, **self.optimizer_params)
+        return self._optimizer_class(
+            self.model.parameters(), 
+            lr=self.learning_rate, 
+            **self.optimizer_params
+            )
