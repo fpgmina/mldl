@@ -77,16 +77,16 @@ def train_model(train_loader: torch.utils.data.DataLoader, val_loader: torch.uti
             "epochs": training_params.epochs,
             "batch_size": train_loader.batch_size,
             "learning_rate": training_params.learning_rate,
-            "architecture": training_params.architecture.__name__,
+            "architecture": training_params.model.__class__.__name__,
             "optimizer": training_params.optimizer.__name__,
             "loss_function": training_params.loss_function.__name__,
             **training_params.optimizer_params,
         }
     )
 
-    model = training_params.architecture().cuda()
-    loss_func = training_params.loss_function()
-    optimizer = training_params.optimizer(model.parameters(), lr=training_params.learning_rate, **training_params.optimizer_params)
+    model = training_params.model.cuda()
+    loss_func = training_params.loss_function
+    optimizer = training_params.optimizer
 
     best_acc = 0
     num_epochs = training_params.epochs
