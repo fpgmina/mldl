@@ -1,5 +1,6 @@
 from torch import nn
 
+
 class AlexNet(nn.Module):
     def __init__(self, num_classes=200):  # Tiny ImageNet has 200 classes
         super(AlexNet, self).__init__()
@@ -34,7 +35,8 @@ class AlexNet(nn.Module):
 
     def forward(self, x):
         x = self.features(x)  # Pass input through feature extraction layers
-        x = x.view(x.size(0), 256 * 1 * 1)  # Flatten the output (adjusted for Tiny ImageNet)
+        x = x.view(
+            x.size(0), 256 * 1 * 1
+        )  # Flatten the output (adjusted for Tiny ImageNet)
         x = self.classifier(x)  # Pass through fully connected layers
         return x
-    
