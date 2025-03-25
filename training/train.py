@@ -76,7 +76,7 @@ def train_model(
     assert isinstance(val_loader, torch.utils.data.DataLoader)
 
     wandb.init(
-        project="mldl_lab3",
+        project="mldl_lab4",
         name=training_params.training_name,
         config={
             "epochs": training_params.epochs,
@@ -113,7 +113,8 @@ def train_model(
         # Save the model with the best validation accuracy
         if val_accuracy > best_acc:
             best_acc = val_accuracy
-            torch.save(model.state_dict(), "best_model.pth")
-            wandb.save("best_model.pth")
+            model_name = f"{training_params.training_name}_best.pth"
+            torch.save(model.state_dict(), model_name)
+            wandb.save(model_name)
 
     wandb.finish()
