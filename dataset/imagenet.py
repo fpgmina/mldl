@@ -4,7 +4,6 @@ import torch
 from torchvision.datasets import ImageFolder
 import torchvision.transforms as T
 from typing import Tuple
-import os
 import requests
 import zipfile
 

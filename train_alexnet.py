@@ -1,5 +1,5 @@
 import torch
-from torch import nn, optim
+from torch import nn
 from dataset.imagenet import get_imagenet_dataloaders
 from models.alexnet import AlexNet
 from training.train import train_model
