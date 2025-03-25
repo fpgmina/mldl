@@ -85,7 +85,7 @@ def train_model(
             "architecture": training_params.model.__class__.__name__,
             "optimizer_class": training_params.optimizer_class.__name__,
             "loss_function": training_params.loss_function.__class__.__name__,
-            **training_params.optimizer_params,
+            **(training_params.optimizer_params or {}),
         },
     )
 
