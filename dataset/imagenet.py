@@ -4,9 +4,13 @@ import torch
 from torchvision.datasets import ImageFolder
 import torchvision.transforms as T
 from typing import Tuple
+import os
+import requests
+import zipfile
 
 
 __all__ = ["get_imagenet_dataloaders"]
+
 
 
 def _is_dataset_valid():
@@ -29,12 +33,30 @@ def _download_and_extract():
     """Download and unzip the Tiny ImageNet dataset if not already present."""
     url = "http://cs231n.stanford.edu/tiny-imagenet-200.zip"
     dataset_path = "tiny-imagenet"
+    zip_path = "tiny-imagenet-200.zip"
 
+    # If dataset directory doesn't exist, download and unzip the dataset
     if not os.path.exists(dataset_path):
-        os.system(f"!wget {url}")
-        os.system(f"!unzip tiny-imagenet-200.zip -d {dataset_path}")
+        # Download the file
+        print("Downloading Tiny ImageNet dataset...")
+        response = requests.get(url, stream=True)
+        with open(zip_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        print("Download completed.")
+
+        # Unzip the downloaded file
+        print("Extracting dataset...")
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(dataset_path)
+        print("Extraction completed.")
+
+        # Remove the zip file after extraction
+        os.remove(zip_path)
     else:
         print(f"{dataset_path} already exists. Skipping download and extraction.")
+
 
 
 def _adjust_validation_format():
