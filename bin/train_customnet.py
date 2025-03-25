@@ -1,12 +1,5 @@
 import torch
 from torch import nn
-import sys
-import os
-
-# Add the root project directory to the system path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(project_root)
-
 from dataset.imagenet import get_imagenet_dataloaders
 from models.cnn import CustomNet
 from training.train import train_model
