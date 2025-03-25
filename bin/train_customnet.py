@@ -17,7 +17,7 @@ if __name__ == "__main__":
         loss_function=nn.CrossEntropyLoss,
         )
 
-    train_loader, val_loader = get_imagenet_dataloaders(batch_size=64)
+    train_loader, val_loader = get_imagenet_dataloaders(batch_size=32)
     train_model(train_loader=train_loader, val_loader=val_loader, training_params=training_params)
     
 
