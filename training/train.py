@@ -1,8 +1,6 @@
 import torch
 from torch import nn
 import wandb
-from dataset.imagenet import get_imagenet_dataloaders
-from models.cnn import CustomNet
 from training.train_params import TrainingParams
 
 def _train(
@@ -36,8 +34,6 @@ def _train(
     train_loss = running_loss / len(train_loader)
     train_accuracy = 100. * correct / total
 
-    print(f'Train Epoch: {epoch} Loss: {train_loss:.6f} Acc: {train_accuracy:.2f}%')
-
     # Log training metrics to wandb
     wandb.log({
         "Train Loss": train_loss,
@@ -65,12 +61,15 @@ def _validate(model: nn.Module, val_loader: torch.utils.data.DataLoader, loss_fu
 
     val_loss = val_loss / len(val_loader)
     val_accuracy = 100. * correct / total
-
-    print(f'Validation Loss: {val_loss:.6f} Acc: {val_accuracy:.2f}%')
     return val_accuracy, val_loss
 
 
 def train_model(train_loader: torch.utils.data.DataLoader, val_loader: torch.utils.data.DataLoader, training_params: TrainingParams):
+    
+    assert isinstance(training_params, TrainingParams)
+    assert isinstance(train_loader, torch.utils.data.DataLoader)
+    assert isinstance(val_loader, torch.utils.data.DataLoader)
+
     wandb.init(
         project="mldl_lab3", 
         name=training_params.training_name, 
@@ -110,5 +109,4 @@ def train_model(train_loader: torch.utils.data.DataLoader, val_loader: torch.uti
             torch.save(model.state_dict(), "best_model.pth")
             wandb.save("best_model.pth")
 
-    print(f'Best validation accuracy: {best_acc:.2f}%')
     wandb.finish()
