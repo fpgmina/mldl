@@ -1,6 +1,5 @@
 from torch import nn
 
-
 class AlexNet(nn.Module):
     def __init__(self, num_classes=200):  # Tiny ImageNet has 200 classes
         super(AlexNet, self).__init__()
@@ -22,10 +21,10 @@ class AlexNet(nn.Module):
             nn.MaxPool2d(kernel_size=3, stride=2),
         )
 
-        # Adjust the size here for the Tiny ImageNet input size
+        # Fully connected layers (adjusted for 224x224 input size)
         self.classifier = nn.Sequential(
             nn.Dropout(),
-            nn.Linear(256 * 1 * 1, 4096),  # 256 * 1 * 1 based on the new output size
+            nn.Linear(256 * 6 * 6, 4096),  # 256 * 6 * 6 for 224x224 input size
             nn.ReLU(inplace=True),
             nn.Dropout(),
             nn.Linear(4096, 4096),
@@ -35,8 +34,6 @@ class AlexNet(nn.Module):
 
     def forward(self, x):
         x = self.features(x)  # Pass input through feature extraction layers
-        x = x.view(
-            x.size(0), 256 * 1 * 1
-        )  # Flatten the output (adjusted for Tiny ImageNet)
+        x = x.view(x.size(0), 256 * 6 * 6)  # Flatten the output (adjusted for 224x224)
         x = self.classifier(x)  # Pass through fully connected layers
         return x
