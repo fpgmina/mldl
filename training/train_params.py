@@ -50,6 +50,6 @@ class TrainingParams:
 
     @property
     def optimizer(self):
-        return self._optimizer_class(
+        return self.optimizer_class(
             self.model.parameters(), lr=self.learning_rate, **self.optimizer_params
         )
