@@ -17,7 +17,7 @@ if __name__ == "__main__":
             training_params = TrainingParams(
                 training_name=f"alexnet_train_lr_{lr}_batchsize_{batch_size}",
                 epochs=10,
-                learning_rate=learning_rates,
+                learning_rate=lr,
                 model=AlexNet(),
                 optimizer_class=torch.optim.SGD,
                 loss_function=nn.CrossEntropyLoss(),
