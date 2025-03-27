@@ -72,10 +72,10 @@ def _validate(
             _, predicted = preds.max(1)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
-            print(correct)
 
     val_loss = val_loss / len(val_loader)
     val_accuracy = 100.0 * correct / total
+    print(f"Correct: {correct}, Total: {total}")
     # Log validation metrics to wandb
     wandb.log(
         {
