@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from dataset.imagenet import get_imagenet_dataloaders
+from ..dataset.imagenet import get_imagenet_dataloaders
 from models.cnn import CustomNet
 from training.train import train_model
 from training.train_params import TrainingParams
