@@ -83,15 +83,15 @@ if __name__ == "__main__":
 
     train_loader, val_loader = get_imagenet_dataloaders(batch_size=32)
 
-    # check_forward_pass(training_params.model.cuda(), train_loader)
-    #
-    # train_on_subset(
-    #     training_params, train_loader, val_loader, epochs=10, project_name="mldl_lab4"
-    # )
+    check_forward_pass(training_params.model.cuda(), train_loader)
 
-    train_model(
-        train_loader=train_loader,
-        val_loader=val_loader,
-        training_params=training_params,
-        project_name="mldl_lab4",
+    train_on_subset(
+        training_params, train_loader, val_loader, epochs=10, project_name="mldl_lab4"
     )
+
+    # train_model(
+    #     train_loader=train_loader,
+    #     val_loader=val_loader,
+    #     training_params=training_params,
+    #     project_name="mldl_lab4",
+    # )
