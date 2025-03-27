@@ -1,5 +1,6 @@
 import optuna
 import torch
+import torchvision
 from torch import nn
 from dataset.imagenet import get_imagenet_dataloaders
 from models.alexnet import AlexNet
@@ -76,7 +77,7 @@ if __name__ == "__main__":
         training_name="alexnet-training_adam",
         epochs=10,
         learning_rate=0.001,
-        model=AlexNet(),
+        model=torchvision.models.alexnet(pretrained=False),  # AlexNet(),
         optimizer_class=torch.optim.Adam,
         loss_function=nn.CrossEntropyLoss(),
     )
@@ -89,9 +90,9 @@ if __name__ == "__main__":
         training_params, train_loader, val_loader, epochs=10, project_name="mldl_lab4"
     )
 
-    # train_model(
-    #     train_loader=train_loader,
-    #     val_loader=val_loader,
-    #     training_params=training_params,
-    #     project_name="mldl_lab4",
-    # )
+    train_model(
+        train_loader=train_loader,
+        val_loader=val_loader,
+        training_params=training_params,
+        project_name="mldl_lab4",
+    )
