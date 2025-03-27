@@ -5,6 +5,7 @@ from dataset.imagenet import get_imagenet_dataloaders
 from models.alexnet import AlexNet
 from training.train import train_model
 from training.train_params import TrainingParams
+from utils.model_utils import check_forward_pass, train_on_subset
 
 
 def train_alexnet(batch_size: int, learning_rate: float) -> float:
@@ -81,8 +82,15 @@ if __name__ == "__main__":
     )
 
     train_loader, val_loader = get_imagenet_dataloaders(batch_size=32)
-    train_model(
-        train_loader=train_loader,
-        val_loader=val_loader,
-        training_params=training_params,
+
+    check_forward_pass(training_params.model.cuda(), train_loader)
+
+    train_on_subset(
+        training_params, train_loader, val_loader, epochs=10, project_name="mldl_lab4"
     )
+
+    # train_model(
+    #     train_loader=train_loader,
+    #     val_loader=val_loader,
+    #     training_params=training_params,
+    # )

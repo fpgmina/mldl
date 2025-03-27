@@ -75,6 +75,7 @@ def train_model(
     training_params: TrainingParams,
     train_loader: torch.utils.data.DataLoader,
     val_loader: Optional[torch.utils.data.DataLoader] = None,
+    project_name: str = "mldl",
 ) -> float:
 
     assert isinstance(training_params, TrainingParams)
@@ -82,7 +83,7 @@ def train_model(
     assert isinstance(val_loader, torch.utils.data.DataLoader)
 
     wandb.init(
-        project="mldl_lab3",
+        project=project_name,
         name=training_params.training_name,
         config={
             "epochs": training_params.epochs,

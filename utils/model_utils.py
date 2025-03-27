@@ -23,7 +23,7 @@ def get_subset_loader(dataloader, subset_size=1000) -> torch.utils.data.DataLoad
     return subset_loader
 
 
-def train_on_subset(training_params, train_loader, val_loader=None, epochs=2):
+def train_on_subset(training_params, train_loader, val_loader=None, epochs=2, **kwargs):
     assert isinstance(training_params, TrainingParams)
     training_params_subset = TrainingParams(
         **{
@@ -35,5 +35,5 @@ def train_on_subset(training_params, train_loader, val_loader=None, epochs=2):
         }
     )
     train_loader_subset = get_subset_loader(train_loader)
-    train_model(training_params_subset, train_loader_subset, val_loader)
+    train_model(training_params_subset, train_loader_subset, val_loader, **kwargs)
     print("Finished training on subset.")

@@ -21,10 +21,13 @@ if __name__ == "__main__":
 
     check_forward_pass(training_params.model.cuda(), train_loader)
 
-    train_on_subset(training_params, train_loader, val_loader, epochs=2)
+    train_on_subset(
+        training_params, train_loader, val_loader, epochs=2, project_name="mldl_lab3"
+    )
 
     train_model(
         training_params=training_params,
         train_loader=train_loader,
         val_loader=val_loader,
+        project_name="mldl_lab3",
     )
