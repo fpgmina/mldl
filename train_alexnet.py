@@ -26,17 +26,19 @@ def train_alexnet(batch_size: int, learning_rate: float) -> float:
     )
     return accuracy
 
+
 def objective(trial: optuna.trial.Trial) -> float:
-    batch_size = trial.suggest_int('batch_size', 16, 64) 
-    learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 1e-1)  # Learning rate between 1e-5 and 1e-1 (log scale)
+    batch_size = trial.suggest_int("batch_size", 16, 64)
+    learning_rate = trial.suggest_loguniform(
+        "learning_rate", 1e-5, 1e-1
+    )  # Learning rate between 1e-5 and 1e-1 (log scale)
 
     accuracy = train_alexnet(batch_size, learning_rate)
 
     return accuracy
 
-
-    #study = optuna.create_study(direction="maximize")
-    #study.optimize(objective, n_trials=5)
+    # study = optuna.create_study(direction="maximize")
+    # study.optimize(objective, n_trials=5)
 
 
 if __name__ == "__main__":
