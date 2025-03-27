@@ -1,5 +1,5 @@
 import optuna
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_digits
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 
@@ -7,7 +7,7 @@ from sklearn.model_selection import cross_val_score
 if __name__ == "__main__":
 
     # Load example dataset
-    X, y = load_iris(return_X_y=True)
+    X, y = load_digits(return_X_y=True)
 
     # 1. Define the objective function
     def objective(trial: optuna.trial.Trial) -> float:
