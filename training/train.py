@@ -1,4 +1,6 @@
 import os
+from typing import Optional
+
 import torch
 from torch import nn
 import wandb
@@ -70,9 +72,9 @@ def _validate(
 
 
 def train_model(
-    train_loader: torch.utils.data.DataLoader,
-    val_loader: torch.utils.data.DataLoader,
     training_params: TrainingParams,
+    train_loader: torch.utils.data.DataLoader,
+    val_loader: Optional[torch.utils.data.DataLoader] = None,
 ) -> float:
 
     assert isinstance(training_params, TrainingParams)
@@ -103,23 +105,24 @@ def train_model(
     for epoch in range(1, num_epochs + 1):
         _train(epoch, model, train_loader, loss_func, optimizer)
 
-        val_accuracy, val_loss = _validate(model, val_loader, loss_func)
+        if val_loader:
+            val_accuracy, val_loss = _validate(model, val_loader, loss_func)
 
-        # Log validation metrics to wandb
-        wandb.log(
-            {
-                "Epoch": epoch,
-                "Validation Loss": val_loss,
-                "Validation Accuracy": val_accuracy,
-            }
-        )
+            # Log validation metrics to wandb
+            wandb.log(
+                {
+                    "Epoch": epoch,
+                    "Validation Loss": val_loss,
+                    "Validation Accuracy": val_accuracy,
+                }
+            )
 
-        # Save the model with the best validation accuracy
-        if val_accuracy > best_acc:
-            best_acc = val_accuracy
-            model_name = f"{training_params.training_name}_best.pth"
-            torch.save(model.state_dict(), model_name)
-            wandb.save(model_name)
+            # Save the model with the best validation accuracy
+            if val_accuracy > best_acc:
+                best_acc = val_accuracy
+                model_name = f"{training_params.training_name}_best.pth"
+                torch.save(model.state_dict(), model_name)
+                wandb.save(model_name)
 
-    wandb.finish()
+        wandb.finish()
     return best_acc
