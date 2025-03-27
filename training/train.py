@@ -11,6 +11,7 @@ os.environ["WANDB_MODE"] = "online"
 
 
 def _train(
+    *,
     epoch: int,
     model: nn.Module,
     train_loader: torch.utils.data.DataLoader,
@@ -45,10 +46,16 @@ def _train(
     wandb.log(
         {"Epoch": epoch, "Train Loss": train_loss, "Train Accuracy": train_accuracy}
     )
+    print(f"Epoch: {epoch}: Train Loss: {train_loss}, Train Accuracy: {train_accuracy}")
+    return train_loss, train_accuracy
 
 
 def _validate(
-    model: nn.Module, val_loader: torch.utils.data.DataLoader, loss_func: nn.Module
+    *,
+    epoch,
+    model: nn.Module,
+    val_loader: torch.utils.data.DataLoader,
+    loss_func: nn.Module,
 ):
     model.eval()
     val_loss = 0
@@ -68,7 +75,18 @@ def _validate(
 
     val_loss = val_loss / len(val_loader)
     val_accuracy = 100.0 * correct / total
-    return val_accuracy, val_loss
+    # Log validation metrics to wandb
+    wandb.log(
+        {
+            "Epoch": epoch,
+            "Validation Loss": val_loss,
+            "Validation Accuracy": val_accuracy,
+        }
+    )
+    print(
+        f"Epoch: {epoch}: Validation Loss: {val_loss}, Validation Accuracy: {val_accuracy}"
+    )
+    return val_loss, val_accuracy
 
 
 def train_model(
@@ -104,18 +122,17 @@ def train_model(
     num_epochs = training_params.epochs
 
     for epoch in range(1, num_epochs + 1):
-        _train(epoch, model, train_loader, loss_func, optimizer)
+        _, _ = _train(
+            epoch=epoch,
+            model=model,
+            train_loader=train_loader,
+            loss_func=loss_func,
+            optimizer=optimizer,
+        )
 
         if val_loader:
-            val_accuracy, val_loss = _validate(model, val_loader, loss_func)
-
-            # Log validation metrics to wandb
-            wandb.log(
-                {
-                    "Epoch": epoch,
-                    "Validation Loss": val_loss,
-                    "Validation Accuracy": val_accuracy,
-                }
+            _, val_accuracy = _validate(
+                epoch=epoch, model=model, val_loader=val_loader, loss_func=loss_func
             )
 
             # Save the model with the best validation accuracy
