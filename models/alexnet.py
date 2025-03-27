@@ -1,12 +1,18 @@
+import torch
 from torch import nn
 
 
 class AlexNet(nn.Module):
+    """
+    AlexNet
+    """
+
     def __init__(self, num_classes=200):  # Tiny ImageNet has 200 classes
         super(AlexNet, self).__init__()
 
         # Define the layers in AlexNet
         self.features = nn.Sequential(
+            # Input size: (batch_size, 3, 224, 224)
             nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
@@ -19,7 +25,7 @@ class AlexNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(256, 256, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.MaxPool2d(kernel_size=3, stride=2),  # Output (batch_size, 256, 6, 6)
         )
 
         # Fully connected layers (adjusted for 224x224 input size)
@@ -35,6 +41,6 @@ class AlexNet(nn.Module):
 
     def forward(self, x):
         x = self.features(x)  # Pass input through feature extraction layers
-        x = x.view(x.size(0), 256 * 6 * 6)  # Flatten the output (adjusted for 224x224)
+        x = torch.flatten(x, 1)  # Flatten the output (adjusted for 224x224)
         x = self.classifier(x)  # Pass through fully connected layers
         return x
