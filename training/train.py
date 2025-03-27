@@ -124,5 +124,5 @@ def train_model(
                 torch.save(model.state_dict(), model_name)
                 wandb.save(model_name)
 
-        wandb.finish()
+    wandb.finish()
     return best_acc
