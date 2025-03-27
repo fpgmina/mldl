@@ -8,6 +8,9 @@ from training.train_params import TrainingParams
 
 
 def train_alexnet(batch_size: int, learning_rate: float) -> float:
+    """
+    Train alexnet for a given batch size and learning rate.
+    """
     training_params = TrainingParams(
         training_name=f"alexnet_train_lr_{learning_rate}_batchsize_{batch_size}",
         epochs=10,
@@ -37,8 +40,10 @@ def objective(trial: optuna.trial.Trial) -> float:
 
     return accuracy
 
-    # study = optuna.create_study(direction="maximize")
-    # study.optimize(objective, n_trials=5)
+
+def main():
+    study = optuna.create_study(direction="maximize")
+    study.optimize(objective, n_trials=5)
 
 
 if __name__ == "__main__":
