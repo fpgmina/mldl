@@ -75,7 +75,8 @@ def _validate(
 
     val_loss = val_loss / len(val_loader)
     val_accuracy = 100.0 * correct / total
-    print(f"Correct: {correct}, Total: {total}")
+
+    # print(f"Correct: {correct}, Total: {total}")
     # Log validation metrics to wandb
     wandb.log(
         {
