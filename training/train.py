@@ -73,7 +73,7 @@ def train_model(
     train_loader: torch.utils.data.DataLoader,
     val_loader: torch.utils.data.DataLoader,
     training_params: TrainingParams,
-):
+) -> float:
 
     assert isinstance(training_params, TrainingParams)
     assert isinstance(train_loader, torch.utils.data.DataLoader)
@@ -122,3 +122,4 @@ def train_model(
             wandb.save(model_name)
 
     wandb.finish()
+    return best_acc
