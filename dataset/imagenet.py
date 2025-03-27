@@ -80,7 +80,7 @@ def _adjust_validation_format():
             )
 
     # Remove the now empty 'images' folder to clean up
-    # shutil.rmtree("tiny-imagenet/tiny-imagenet-200/val/images")
+    shutil.rmtree("tiny-imagenet/tiny-imagenet-200/val/images")
 
 
 def _get_transform():
