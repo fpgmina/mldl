@@ -9,7 +9,7 @@ from utils.model_utils import check_forward_pass, train_on_subset
 if __name__ == "__main__":
 
     training_params = TrainingParams(
-        training_name="cnn-training_refactor_data",
+        training_name="cnn-training_fix",
         epochs=10,
         learning_rate=0.001,
         model=CustomNet(),
