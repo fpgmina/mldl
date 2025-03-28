@@ -72,23 +72,30 @@ if __name__ == "__main__":
     #             val_loader=val_loader,
     #             training_params=training_params,
     #         )
-
+    train_subset = False
     training_params = TrainingParams(
-        training_name="alexnet-training_adam",
+        training_name="alexnet-training_adam_torchvision",
         epochs=10,
         learning_rate=0.001,
-        model=torchvision.models.alexnet(pretrained=False),  # AlexNet(),
+        model=torchvision.models.alexnet(
+            pretrained=False, num_classes=200
+        ),  # AlexNet(),
         optimizer_class=torch.optim.Adam,
         loss_function=nn.CrossEntropyLoss(),
     )
 
     train_loader, val_loader = get_imagenet_dataloaders(batch_size=32)
 
-    check_forward_pass(training_params.model.cuda(), train_loader, num_classes=1000)
+    check_forward_pass(training_params.model.cuda(), train_loader, num_classes=200)
 
-    train_on_subset(
-        training_params, train_loader, val_loader, epochs=10, project_name="mldl_lab4"
-    )
+    if train_subset:
+        train_on_subset(
+            training_params,
+            train_loader,
+            val_loader,
+            epochs=2,
+            project_name="mldl_lab4",
+        )
 
     train_model(
         train_loader=train_loader,
