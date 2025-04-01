@@ -76,7 +76,7 @@ def get_dataloaders():
     # URL and file path configurations
     url = "https://github.com/mrdbourke/pytorch-deep-learning/raw/main/data/pizza_steak_sushi.zip"
     file_name = "pizza_steak_sushi.zip"
-    data_dir = "data/pizza_steak_sushi"
+    data_dir = "data/"
 
     # Download, unzip, and prepare data
     download_data(url, file_name)
