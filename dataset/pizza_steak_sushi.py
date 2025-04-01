@@ -4,6 +4,9 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
 
+__all__ = ["get_dataloaders"]
+
+
 def download_data(url: str, file_name: str):
     """
     Download the dataset from the given URL and save it to the specified file.
