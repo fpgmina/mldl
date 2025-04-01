@@ -1,4 +1,3 @@
-import os
 import zipfile
 import requests
 from torchvision import datasets, transforms

@@ -1,4 +1,13 @@
+import torch
+import torchvision
+
+
+def get_device():
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
 def get_pretrained_model():
+    device = get_device()
     # take a large model e.g. pretrained on a dataset like ImageNet
     model = torchvision.models.efficientnet_b0(pretrained=True).to(device)
     # >>> model.classifier
@@ -13,8 +22,9 @@ def get_model(model, class_names, seed=42):
     """
     Given a pre-trained model, extract (pre-trained) CNN layer and fit new classifier.
     """
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    # Freeze all base layers in the "features" section of the model (the feature extractor) by setting requires_grad=False
+    device = get_device()
+    # Freeze all base layers in the "features" section of the model (the feature extractor)
+    # by setting requires_grad=False
     for param in model.features.parameters():
         param.requires_grad = False
 
