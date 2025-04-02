@@ -1,8 +1,8 @@
 # train pizza steak sushi
 import torch
 from torch import nn
-from dataset.pizza_steak_sushi import get_dataloaders
-from models.transfer_learning import get_model, get_pretrained_model
+from dataset.pss import get_dataloaders
+from models.transfer_learning_net import get_model, get_pretrained_model
 from training.train import train_model
 from training.train_params import TrainingParams
 

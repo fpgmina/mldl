@@ -1,3 +1,4 @@
+# pizza steak sushi dataset
 import zipfile
 import requests
 from torchvision import datasets, transforms
