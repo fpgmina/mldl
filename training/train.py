@@ -7,7 +7,7 @@ import wandb
 from training.train_params import TrainingParams
 from utils.model_utils import get_device, get_subset_loader
 
-__all__ = ["train_model", "compute_predictions"]
+__all__ = ["train_model", "compute_predictions", "train_on_subset"]
 
 
 os.environ["WANDB_MODE"] = "online"
@@ -15,7 +15,6 @@ os.environ["WANDB_MODE"] = "online"
 
 def _train(
     *,
-    epoch: int,
     model: nn.Module,
     train_loader: torch.utils.data.DataLoader,
     loss_func: nn.Module,
@@ -45,11 +44,6 @@ def _train(
     train_loss = running_loss / len(train_loader)
     train_accuracy = 100.0 * correct / total
 
-    # Log training metrics to wandb
-    wandb.log(
-        {"Epoch": epoch, "Train Loss": train_loss, "Train Accuracy": train_accuracy}
-    )
-    print(f"Epoch: {epoch}: Train Loss: {train_loss}, Train Accuracy: {train_accuracy}")
     return train_loss, train_accuracy
 
 
@@ -71,6 +65,8 @@ def compute_predictions(
     Returns:
         predictions: Tensor of predictions.
         labels: Tensor of true labels.
+        loss: Computed loss for the given data.
+        accuracy: Computed accuracy for the given data.
     """
     model.eval()  # Set the model to evaluation mode
     predictions = []
@@ -109,32 +105,6 @@ def compute_predictions(
     return predictions, labels, loss, accuracy
 
 
-def _validate(
-    *,
-    epoch,
-    model: nn.Module,
-    val_loader: torch.utils.data.DataLoader,
-    loss_func: nn.Module,
-):
-    assert loss_func is not None
-
-    _, _, val_loss, val_accuracy = compute_predictions(
-        model=model, dataloader=val_loader, loss_function=loss_func
-    )
-
-    wandb.log(
-        {
-            "Epoch": epoch,
-            "Validation Loss": val_loss,
-            "Validation Accuracy": val_accuracy,
-        }
-    )
-    print(
-        f"Epoch: {epoch}: Validation Loss: {val_loss}, Validation Accuracy: {val_accuracy}"
-    )
-    return val_loss, val_accuracy
-
-
 def train_model(
     *,
     training_params: TrainingParams,
@@ -160,8 +130,8 @@ def train_model(
             **(training_params.optimizer_params or {}),
         },
     )
-
-    model = training_params.model.cuda()
+    device = get_device()
+    model = training_params.model.to(device)
     loss_func = training_params.loss_function
     optimizer = training_params.optimizer
 
@@ -169,17 +139,34 @@ def train_model(
     num_epochs = training_params.epochs
 
     for epoch in range(1, num_epochs + 1):
-        _, _ = _train(
-            epoch=epoch,
+        train_loss, train_accuracy = _train(
             model=model,
             train_loader=train_loader,
             loss_func=loss_func,
             optimizer=optimizer,
         )
+        # Log training metrics to wandb
+        wandb.log(
+            {"Epoch": epoch, "Train Loss": train_loss, "Train Accuracy": train_accuracy}
+        )
+        print(
+            f"Epoch: {epoch}: Train Loss: {train_loss}, Train Accuracy: {train_accuracy}"
+        )
 
         if val_loader:
-            _, val_accuracy = _validate(
-                epoch=epoch, model=model, val_loader=val_loader, loss_func=loss_func
+            _, _, val_loss, val_accuracy = compute_predictions(
+                model=model, dataloader=val_loader, loss_function=loss_func
+            )
+
+            wandb.log(
+                {
+                    "Epoch": epoch,
+                    "Validation Loss": val_loss,
+                    "Validation Accuracy": val_accuracy,
+                }
+            )
+            print(
+                f"Epoch: {epoch}: Validation Loss: {val_loss}, Validation Accuracy: {val_accuracy}"
             )
 
             # Save the model with the best validation accuracy
