@@ -5,6 +5,10 @@ import torch
 from torch import nn
 import wandb
 from training.train_params import TrainingParams
+from utils.model_utils import get_device
+
+
+__all__ = ["train_model", "compute_predictions"]
 
 
 os.environ["WANDB_MODE"] = "online"
@@ -18,14 +22,14 @@ def _train(
     loss_func: nn.Module,
     optimizer: torch.optim.Optimizer,
 ):
-
+    device = get_device()
     model.train()
     running_loss = 0.0
     correct = 0
     total = 0
 
     for inputs, targets in train_loader:
-        inputs, targets = inputs.cuda(), targets.cuda()
+        inputs, targets = inputs.to(device), targets.to(device)
 
         preds = model(inputs)
         loss = loss_func(preds, targets)
@@ -50,6 +54,62 @@ def _train(
     return train_loss, train_accuracy
 
 
+def compute_predictions(
+    model: nn.Module,
+    dataloader: torch.utils.data.DataLoader,
+    device: Optional[str] = None,
+    loss_function: Optional[nn.Module] = None,
+):
+    """
+    Compute predictions for a given dataloader using the trained model.
+
+    Args:
+        model: The trained model.
+        dataloader: The DataLoader containing the test or train dataset.
+        device: The device to use ('cpu' or 'cuda').
+        loss_function: The loss function to minimize in training.
+
+    Returns:
+        predictions: Tensor of predictions.
+        labels: Tensor of true labels.
+    """
+    model.eval()  # Set the model to evaluation mode
+    predictions = []
+    labels = []
+    device = device or get_device()
+
+    loss = 0.0
+
+    # Disable gradient computation during inference
+    with torch.no_grad():
+        for inputs, targets in dataloader:
+            inputs, targets = inputs.to(device), targets.to(
+                device
+            )  # Move to the appropriate device
+
+            # Forward pass
+            preds = model(inputs)  # Get raw model predictions
+
+            if loss_function is not None:
+                loss += loss_function(preds, targets).item()
+
+            # Get predicted class (class with the highest score)
+            _, predicted = torch.max(preds, 1)
+
+            predictions.append(predicted)
+            labels.append(targets)
+
+    # Concatenate all predictions and labels
+    predictions = torch.cat(predictions)
+    labels = torch.cat(labels)
+
+    correct = (predictions == labels).sum().item()
+    accuracy = 100.0 * correct / len(labels)
+    loss = loss / len(labels)
+
+    return predictions, labels, loss, accuracy
+
+
 def _validate(
     *,
     epoch,
@@ -57,27 +117,12 @@ def _validate(
     val_loader: torch.utils.data.DataLoader,
     loss_func: nn.Module,
 ):
-    model.eval()
-    val_loss = 0
-    correct, total = 0, 0
+    assert loss_func is not None
 
-    with torch.no_grad():
-        for inputs, targets in val_loader:
-            inputs, targets = inputs.cuda(), targets.cuda()
+    _, _, val_loss, val_accuracy = compute_predictions(
+        model=model, dataloader=val_loader, loss_function=loss_func
+    )
 
-            preds = model(inputs)
-            loss = loss_func(preds, targets)
-
-            val_loss += loss.item()
-            _, predicted = preds.max(1)
-            total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
-
-    val_loss = val_loss / len(val_loader)
-    val_accuracy = 100.0 * correct / total
-
-    # print(f"Correct: {correct}, Total: {total}")
-    # Log validation metrics to wandb
     wandb.log(
         {
             "Epoch": epoch,
@@ -92,6 +137,7 @@ def _validate(
 
 
 def train_model(
+    *,
     training_params: TrainingParams,
     train_loader: torch.utils.data.DataLoader,
     val_loader: Optional[torch.utils.data.DataLoader] = None,

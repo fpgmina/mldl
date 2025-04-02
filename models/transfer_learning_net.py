@@ -1,9 +1,7 @@
 import torch
 import torchvision
 
-
-def get_device():
-    return "cuda" if torch.cuda.is_available() else "cpu"
+from utils.model_utils import get_device
 
 
 def get_pretrained_model():
