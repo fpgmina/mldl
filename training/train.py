@@ -5,8 +5,7 @@ import torch
 from torch import nn
 import wandb
 from training.train_params import TrainingParams
-from utils.model_utils import get_device
-
+from utils.model_utils import get_device, get_subset_loader
 
 __all__ = ["train_model", "compute_predictions"]
 
@@ -192,3 +191,24 @@ def train_model(
 
     wandb.finish()
     return best_acc
+
+
+def train_on_subset(training_params, train_loader, val_loader=None, epochs=2, **kwargs):
+    assert isinstance(training_params, TrainingParams)
+    training_params_subset = TrainingParams(
+        **{
+            **training_params.__dict__,
+            **{
+                "training_name": f"{training_params.training_name}_SUBSET",
+                "epochs": epochs,
+            },
+        }
+    )
+    train_loader_subset = get_subset_loader(train_loader)
+    train_model(
+        training_params=training_params_subset,
+        train_loader=train_loader_subset,
+        val_loader=val_loader,
+        **kwargs,
+    )
+    print("Finished training on subset.")

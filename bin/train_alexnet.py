@@ -4,9 +4,9 @@ import torchvision
 from torch import nn
 from dataset.imagenet import get_imagenet_dataloaders
 from models.alexnet import AlexNet
-from training.train import train_model
+from training.train import train_model, train_on_subset
 from training.train_params import TrainingParams
-from utils.model_utils import check_forward_pass, train_on_subset
+from utils.model_utils import check_forward_pass
 
 
 def train_alexnet(batch_size: int, learning_rate: float) -> float:
