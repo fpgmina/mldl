@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Optional
 
@@ -11,6 +12,13 @@ __all__ = ["train_model", "compute_predictions", "train_on_subset"]
 
 
 os.environ["WANDB_MODE"] = "online"
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",  # format like a print
+    handlers=[logging.StreamHandler()],  # output logs to console
+)
 
 
 def _train(
@@ -149,7 +157,7 @@ def train_model(
         wandb.log(
             {"Epoch": epoch, "Train Loss": train_loss, "Train Accuracy": train_accuracy}
         )
-        print(
+        logging.info(
             f"Epoch: {epoch}: Train Loss: {train_loss}, Train Accuracy: {train_accuracy}"
         )
 
@@ -165,7 +173,7 @@ def train_model(
                     "Validation Accuracy": val_accuracy,
                 }
             )
-            print(
+            logging.info(
                 f"Epoch: {epoch}: Validation Loss: {val_loss}, Validation Accuracy: {val_accuracy}"
             )
 
@@ -198,4 +206,4 @@ def train_on_subset(training_params, train_loader, val_loader=None, epochs=2, **
         val_loader=val_loader,
         **kwargs,
     )
-    print("Finished training on subset.")
+    logging.info("Finished training on subset.")
