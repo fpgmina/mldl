@@ -95,7 +95,7 @@ def _get_transform():
 
 
 def _get_imagenet_datasets() -> Tuple[ImageFolder, ImageFolder]:
-    """Load and return Tiny ImageNet datasets for training and validation."""
+    """Load and return Tiny ImageNet datasets for core and validation."""
     transform = _get_transform()
 
     # Loading train and validation datasets using ImageFolder

@@ -31,7 +31,7 @@ def unzip_data(file_name: str, extract_to: str):
 
 def get_transform():
     """
-    Create a transform to resize and normalize images for training.
+    Create a transform to resize and normalize images for core.
     """
     return transforms.Compose(
         [
@@ -56,7 +56,7 @@ def load_datasets(data_dir: str, transform):
 
 def create_dataloaders(train_dset, test_dset, batch_size=32):
     """
-    Create DataLoader instances for training and testing datasets.
+    Create DataLoader instances for core and testing datasets.
     """
     train_dataloader = DataLoader(
         train_dset, batch_size=batch_size, num_workers=2, shuffle=True
@@ -68,7 +68,7 @@ def create_dataloaders(train_dset, test_dset, batch_size=32):
 
 def get_class_names(train_dset):
     """
-    Get the class names from the training dataset.
+    Get the class names from the core dataset.
     """
     return train_dset.classes
 

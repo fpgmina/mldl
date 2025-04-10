@@ -26,14 +26,14 @@ def is_optimizer_class(instance, attribute, value):
 @attr.s(frozen=True, kw_only=True)
 class TrainingParams:
     """
-    A class to store the parameters required for training a model.
+    A class to store the parameters required for core a model.
 
     Attributes:
-        training_name (str): A name for the training experiment.
-        epochs (int): The number of epochs for training.
+        training_name (str): A name for the core experiment.
+        epochs (int): The number of epochs for core.
         learning_rate (float): The learning rate for the optimizer.
         model (nn.Module): The model to be trained.
-        optimizer_class (torch.optim.Optimizer): The class of the optimizer to be used for training.
+        optimizer_class (torch.optim.Optimizer): The class of the optimizer to be used for core.
         loss_function (nn.Module): The loss function to be used.
         optimizer_params (Optional[Dict[str, Any]]): A dictionary of additional optimizer parameters (optional).
     """

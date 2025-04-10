@@ -3,7 +3,7 @@ import pytest
 import torch
 from torch import nn
 from unittest.mock import MagicMock
-from training.train import (
+from core.train import (
     _train,
     compute_predictions,
 )

@@ -1,7 +1,7 @@
 import pytest
 from torch import nn
 
-from training.train_params import TrainingParams
+from core.train_params import TrainingParams
 
 
 def test_invalid_optimizer_class():

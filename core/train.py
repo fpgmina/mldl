@@ -5,7 +5,7 @@ from typing import Optional
 import torch
 from torch import nn
 import wandb
-from training.train_params import TrainingParams
+from core.train_params import TrainingParams
 from utils.model_utils import get_device, get_subset_loader
 
 __all__ = ["train_model", "compute_predictions", "train_on_subset"]
@@ -68,7 +68,7 @@ def compute_predictions(
         model: The trained model.
         dataloader: The DataLoader containing the test or train dataset.
         device: The device to use ('cpu' or 'cuda').
-        loss_function: The loss function to minimize in training.
+        loss_function: The loss function to minimize in core.
 
     Returns:
         predictions: Tensor of predictions.
@@ -153,7 +153,7 @@ def train_model(
             loss_func=loss_func,
             optimizer=optimizer,
         )
-        # Log training metrics to wandb
+        # Log core metrics to wandb
         wandb.log(
             {"Epoch": epoch, "Train Loss": train_loss, "Train Accuracy": train_accuracy}
         )
@@ -206,4 +206,4 @@ def train_on_subset(training_params, train_loader, val_loader=None, epochs=2, **
         val_loader=val_loader,
         **kwargs,
     )
-    logging.info("Finished training on subset.")
+    logging.info("Finished core on subset.")

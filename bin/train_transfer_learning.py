@@ -3,8 +3,8 @@ import torch
 from torch import nn
 from dataset.pss import get_dataloaders
 from models.transfer_learning_net import get_model, get_pretrained_model
-from training.train import train_model
-from training.train_params import TrainingParams
+from core.train import train_model
+from core.train_params import TrainingParams
 
 if __name__ == "__main__":
     train_dataloader, test_dataloader, class_names = get_dataloaders()
