@@ -79,7 +79,10 @@ def non_iid_sharding(
 
 
 def get_cifar_dataloader(
-    dataset: Dataset, indices: List[int] = None, batch_size: int = 32, shuffle: bool = True
+    dataset: Dataset,
+    indices: List[int] = None,
+    batch_size: int = 32,
+    shuffle: bool = True,
 ) -> DataLoader:
     """
     Return a DataLoader for the CIFAR dataset, optionally using a subset of the data.
