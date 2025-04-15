@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import torch
 import torchvision
@@ -80,7 +80,7 @@ def non_iid_sharding(
 
 def get_cifar_dataloader(
     dataset: Dataset,
-    indices: List[int] = None,
+    indices: Optional[List[int]] = None,
     batch_size: int = 32,
     shuffle: bool = True,
 ) -> DataLoader:
