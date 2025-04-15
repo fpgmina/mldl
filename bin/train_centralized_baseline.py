@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+from core.train import train_model
 from core.train_params import TrainingParams
 from dataset.cifar_100 import (
     get_cifar_100_datasets,
@@ -18,10 +19,17 @@ if __name__ == "__main__":
     model = get_dino_backbone_model()
 
     params = TrainingParams(
-        training_name="centralized_baseline",
+        training_name="centralized_baseline_test",
         model=model,
         loss_function=nn.CrossEntropyLoss(),
         learning_rate=1e-3,
         optimizer_class=torch.optim.Adam,
         epochs=10,
+    )
+    
+    train_model(
+        training_params=params,
+        train_loader=train_dataloader,
+        val_loader=val_dataloader,
+        project_name="fl_centralized_baseline",
     )
