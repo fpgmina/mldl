@@ -11,6 +11,9 @@ from collections import defaultdict
 def get_cifar_100_transform():
     transform = transforms.Compose(
         [
+            transforms.Resize(
+                224
+            ),  # resize to 224 x 224 (required by ViT) # TODO clarify
             transforms.ToTensor(),
             transforms.Normalize([0.5071, 0.4865, 0.4409], [0.2673, 0.2564, 0.2762]),
         ]
