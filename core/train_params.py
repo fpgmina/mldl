@@ -57,7 +57,7 @@ class TrainingParams:
     loss_function: nn.Module = attr.ib(validator=is_nn_module)  # Custom validation
     optimizer_class: torch.optim.Optimizer = attr.ib(validator=is_optimizer_class)
     scheduler_class: Optional[torch.optim.lr_scheduler.LRScheduler] = attr.ib(
-        validator=is_optimizer_class, default=None
+        validator=is_scheduler_class, default=None
     )
     optimizer_params: Optional[Dict[str, Any]] = attr.ib(default=None)
     scheduler_params: Optional[Dict[str, Any]] = attr.ib(default=None)
