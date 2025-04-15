@@ -4,6 +4,7 @@ from typing import Optional
 
 import torch
 from torch import nn
+from torch.utils.data import DataLoader
 import wandb
 from core.train_params import TrainingParams
 from utils.model_utils import get_device, get_subset_loader
@@ -24,7 +25,7 @@ logging.basicConfig(
 def _train(
     *,
     model: nn.Module,
-    train_loader: torch.utils.data.DataLoader,
+    train_loader: DataLoader,
     loss_func: nn.Module,
     optimizer: torch.optim.Optimizer,
 ):
@@ -57,7 +58,7 @@ def _train(
 
 def compute_predictions(
     model: nn.Module,
-    dataloader: torch.utils.data.DataLoader,
+    dataloader: DataLoader,
     device: Optional[str] = None,
     loss_function: Optional[nn.Module] = None,
 ):
@@ -116,8 +117,8 @@ def compute_predictions(
 def train_model(
     *,
     training_params: TrainingParams,
-    train_loader: torch.utils.data.DataLoader,
-    val_loader: Optional[torch.utils.data.DataLoader] = None,
+    train_loader: DataLoader,
+    val_loader: Optional[DataLoader] = None,
     project_name: str = "mldl",
 ) -> float:
 

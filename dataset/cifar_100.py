@@ -7,6 +7,8 @@ from torch.utils.data import DataLoader, Dataset, random_split
 import numpy as np
 from collections import defaultdict
 
+from utils.numpy_utils import numpy_random_seed
+
 
 def get_cifar_100_transform():
     transform = transforms.Compose(
@@ -34,19 +36,28 @@ def get_cifar_100_datasets():
     return trainset, testset
 
 
-def get_cifar_100_train_valset_datasets(dataset: Dataset) -> Tuple[Dataset, Dataset]:
-    train_size = int(0.8 * len(dataset))  # type: ignore # 80pc train, 20pc validation
-    val_size = len(dataset) - train_size  # type: ignore
-    trainset, valset = random_split(dataset, [train_size, val_size])
+def get_cifar_100_train_valset_datasets(
+    dataset: Dataset, seed: int = 42
+) -> Tuple[Dataset, Dataset]:
+    data_size = len(dataset)  # type: ignore
+    train_size = int(0.8 * data_size)  # 80pc train, 20pc validation
+    val_size = data_size - train_size
+    trainset, valset = random_split(
+        dataset, [train_size, val_size], generator=torch.Generator().manual_seed(seed)
+    )
     return trainset, valset
 
 
-def iid_sharding(dataset: Dataset, num_clients: int) -> Dict[int, List[int]]:
-    # Split the dataset into K equal parts, each with samples from all classes
-    indices = np.random.permutation(len(dataset))  # type: ignore
+def iid_sharding(
+    dataset: Dataset, num_clients: int, seed: Optional[int] = 42
+) -> Dict[int, List[int]]:
+    # Split the dataset into num_clients equal parts, each with samples from all classes
+    data_len = len(dataset)  # type: ignore
+    with numpy_random_seed(seed):
+        indices = np.random.permutation(data_len)
     client_data = defaultdict(list)
 
-    for i in range(len(dataset)):  # type: ignore
+    for i in range(data_len):
         client_id = i % num_clients
         client_data[client_id].append(indices[i])
 
@@ -54,7 +65,10 @@ def iid_sharding(dataset: Dataset, num_clients: int) -> Dict[int, List[int]]:
 
 
 def non_iid_sharding(
-    dataset: Dataset, num_clients: int, num_classes: int
+    dataset: Dataset,
+    num_clients: int,
+    num_classes: int,
+    seed: Optional[int] = 42,
 ) -> Dict[int, List[int]]:
     # Split the dataset into K parts with non-i.i.d. distribution
     client_data = defaultdict(list)
@@ -66,7 +80,8 @@ def non_iid_sharding(
 
     # Distribute classes to clients
     classes = list(class_indices.keys())
-    np.random.shuffle(classes)
+    with numpy_random_seed(seed):
+        np.random.shuffle(classes)
 
     class_per_client = num_classes  # Number of classes per client
 
