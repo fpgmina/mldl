@@ -19,7 +19,7 @@ if __name__ == "__main__":
     model = get_dino_backbone_model()
 
     params = TrainingParams(
-        training_name="centralized_baseline_test",
+        training_name="centralized_baseline_momentum_cosineLR",
         model=model,
         loss_function=nn.CrossEntropyLoss(),
         learning_rate=1e-3,
