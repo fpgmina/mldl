@@ -34,7 +34,7 @@ def get_cifar_100_datasets():
     return trainset, testset
 
 
-def get_cifar_100_train_valset_split(dataset: Dataset) -> Tuple[Dataset, Dataset]:
+def get_cifar_100_train_valset_datasets(dataset: Dataset) -> Tuple[Dataset, Dataset]:
     train_size = int(0.8 * len(dataset))  # type: ignore # 80pc train, 20pc validation
     val_size = len(dataset) - train_size  # type: ignore
     trainset, valset = random_split(dataset, [train_size, val_size])
