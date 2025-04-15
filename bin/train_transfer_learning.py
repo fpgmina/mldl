@@ -15,7 +15,7 @@ if __name__ == "__main__":
         model=model,
         loss_function=nn.CrossEntropyLoss(),
         learning_rate=1e-3,
-        optimizer_class=torch.optim.Adam,
+        optimizer_class=torch.optim.Adam,  # type: ignore
         epochs=10,
     )
     train_model(

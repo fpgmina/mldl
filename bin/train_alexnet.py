@@ -18,7 +18,7 @@ def train_alexnet(batch_size: int, learning_rate: float) -> float:
         epochs=10,
         learning_rate=learning_rate,
         model=AlexNet(),
-        optimizer_class=torch.optim.SGD,
+        optimizer_class=torch.optim.SGD,  # type: ignore
         loss_function=nn.CrossEntropyLoss(),
         optimizer_params={"weight_decay": 5e-4, "momentum": 0.9},
     )

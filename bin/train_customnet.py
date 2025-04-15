@@ -13,7 +13,7 @@ if __name__ == "__main__":
         epochs=10,
         learning_rate=0.001,
         model=CustomNet(),
-        optimizer_class=torch.optim.Adam,
+        optimizer_class=torch.optim.Adam,  # type: ignore
         loss_function=nn.CrossEntropyLoss(),
     )
 

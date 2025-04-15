@@ -109,7 +109,7 @@ if __name__ == "__main__":
     num_classes = 2  # Number of classes per client (non iid)
 
     train_set, _ = get_cifar_100_datasets()
-    trainset, valset = get_cifar_100_train_valset_split(train_set)
+    trainset, valset = get_cifar_100_train_valset_datasets(train_set)
 
     iid_client_data = iid_sharding(trainset, K)
     non_iid_client_data = non_iid_sharding(trainset, K, num_classes)
