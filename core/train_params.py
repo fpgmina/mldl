@@ -73,4 +73,4 @@ class TrainingParams:
     def scheduler(self):
         scheduler_params = self.scheduler_params or {}
         if self.scheduler_class:
-            return self.scheduler_class(self.optimizer, **scheduler_params)
+            return self.scheduler_class(self.optimizer, T_max=50, **scheduler_params)
