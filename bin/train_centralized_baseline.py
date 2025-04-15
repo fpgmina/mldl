@@ -23,10 +23,11 @@ if __name__ == "__main__":
         model=model,
         loss_function=nn.CrossEntropyLoss(),
         learning_rate=1e-3,
-        optimizer_class=torch.optim.Adam,  # type: ignore
-        epochs=10,
+        optimizer_class=torch.optim.SGD,  # type: ignore
+        scheduler_class=torch.optim.lr_scheduler.CosineAnnealingLR,  # type: ignore
+        epochs=5,
+        optimizer_params={"momentum": 0.9, "weight_decay": 5e-4},
     )
-
     train_model(
         training_params=params,
         train_loader=train_dataloader,

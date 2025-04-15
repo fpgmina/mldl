@@ -3,6 +3,7 @@ import torch
 from torch import nn
 from typing import Optional, Dict, Any
 from torch.optim import Optimizer
+from torch.optim.lr_scheduler import LRScheduler
 
 
 def is_nn_module(instance, attribute, value):
@@ -19,6 +20,15 @@ def is_optimizer_class(instance, attribute, value):
     if not issubclass(value, Optimizer):
         raise TypeError(
             f"{attribute.name} must be a subclass of torch.optim.Optimizer."
+        )
+    return value
+
+
+def is_scheduler_class(instance, attribute, value):
+    """Validator to check if the value is a subclass of torch.optim.lr_scheduler.LRScheduler"""
+    if not issubclass(value, LRScheduler):
+        raise TypeError(
+            f"{attribute.name} must be a subclass of torch.optim.lr_scheduler.LRScheduler"
         )
     return value
 
@@ -46,7 +56,11 @@ class TrainingParams:
     )  # Custom validation to pass instance check (instance_of checks for exact type and not for superclasses)
     loss_function: nn.Module = attr.ib(validator=is_nn_module)  # Custom validation
     optimizer_class: torch.optim.Optimizer = attr.ib(validator=is_optimizer_class)
+    scheduler_class: Optional[torch.optim.lr_scheduler.LRScheduler] = attr.ib(
+        validator=is_optimizer_class, default=None
+    )
     optimizer_params: Optional[Dict[str, Any]] = attr.ib(default=None)
+    scheduler_params: Optional[Dict[str, Any]] = attr.ib(default=None)
 
     @property
     def optimizer(self):
@@ -54,3 +68,9 @@ class TrainingParams:
         return self.optimizer_class(
             self.model.parameters(), lr=self.learning_rate, **optimizer_params
         )
+
+    @property
+    def scheduler(self):
+        scheduler_params = self.scheduler_params or {}
+        if self.scheduler_class:
+            return self.scheduler_class(self.optimizer, **scheduler_params)

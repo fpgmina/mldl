@@ -28,6 +28,7 @@ def _train(
     train_loader: DataLoader,
     loss_func: nn.Module,
     optimizer: torch.optim.Optimizer,
+    scheduler: Optional[torch.optim.lr_scheduler.LRScheduler] = None,
 ):
     device = get_device()
     model.train()
@@ -44,6 +45,9 @@ def _train(
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
+        if scheduler is not None:
+            scheduler.step()
 
         running_loss += loss.item()
         _, predicted = preds.max(1)
@@ -143,6 +147,7 @@ def train_model(
     model = training_params.model.to(device)
     loss_func = training_params.loss_function
     optimizer = training_params.optimizer
+    scheduler = training_params.scheduler
 
     best_acc = 0
     num_epochs = training_params.epochs
@@ -153,6 +158,7 @@ def train_model(
             train_loader=train_loader,
             loss_func=loss_func,
             optimizer=optimizer,
+            scheduler=scheduler,
         )
         # Log core metrics to wandb
         wandb.log(
