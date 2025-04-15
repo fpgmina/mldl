@@ -11,6 +11,7 @@ fsspec==2025.3.0
 gitdb==4.0.12
 GitPython==3.1.44
 greenlet==3.1.1
+huggingface-hub==0.30.2
 idna==3.10
 iniconfig==2.1.0
 Jinja2==3.1.6
@@ -33,6 +34,7 @@ pytest==8.3.5
 PyYAML==6.0.2
 requests==2.32.3
 ruff==0.11.1
+safetensors==0.5.3
 scikit-learn==1.6.1
 scipy==1.15.2
 sentry-sdk==2.23.1
@@ -42,6 +44,7 @@ smmap==5.0.2
 SQLAlchemy==2.0.39
 sympy==1.13.3
 threadpoolctl==3.6.0
+timm==1.0.15
 torch==2.2.2
 torchvision==0.17.2
 tqdm==4.67.1

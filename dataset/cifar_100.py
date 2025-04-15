@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import torch
 import torchvision
@@ -34,7 +34,7 @@ def get_cifar_100_datasets():
     return trainset, testset
 
 
-def get_cifar_100_train_valset_split(dataset: Dataset):
+def get_cifar_100_train_valset_split(dataset: Dataset) -> Tuple[Dataset, Dataset]:
     train_size = int(0.8 * len(dataset))  # type: ignore # 80pc train, 20pc validation
     val_size = len(dataset) - train_size  # type: ignore
     trainset, valset = random_split(dataset, [train_size, val_size])
@@ -79,10 +79,24 @@ def non_iid_sharding(
 
 
 def get_cifar_dataloader(
-    dataset: Dataset, indices: List[int], batch_size: int = 32, shuffle: bool = True
+    dataset: Dataset, indices: List[int] = None, batch_size: int = 32, shuffle: bool = True
 ) -> DataLoader:
-    dataset_subset = torch.utils.data.Subset(dataset, indices=indices)
-    loader = DataLoader(dataset_subset, batch_size=batch_size, shuffle=shuffle)
+    """
+    Return a DataLoader for the CIFAR dataset, optionally using a subset of the data.
+
+    Args:
+        dataset (Dataset): The CIFAR dataset to be loaded.
+        indices (List[int], optional): A list of indices to create a subset of the dataset. If None, the entire dataset is used. Defaults to None.
+        batch_size (int, optional): The number of samples per batch. Defaults to 32.
+        shuffle (bool, optional): Whether to shuffle the data at the beginning of each epoch. Defaults to True.
+            NB Should be set to False for test dataset and to True for train/val datasets.
+
+    Returns:
+        DataLoader: A DataLoader for the CIFAR dataset, potentially using a subset of the data.
+    """
+    if indices is not None:
+        dataset = torch.utils.data.Subset(dataset, indices=indices)
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return loader
 
 
