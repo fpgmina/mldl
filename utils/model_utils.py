@@ -27,7 +27,7 @@ def check_forward_pass(
 def get_subset_loader(
     dataloader: torch.utils.data.DataLoader, subset_size: int = 1000
 ) -> torch.utils.data.DataLoader:
-    dataset_size = len(dataloader.dataset)
+    dataset_size = len(dataloader.dataset)  # type: ignore
     subset_indices = np.random.choice(dataset_size, subset_size, replace=False)
     subset_dataset = Subset(dataloader.dataset, subset_indices)
     subset_loader = DataLoader(subset_dataset, batch_size=32, shuffle=True)
