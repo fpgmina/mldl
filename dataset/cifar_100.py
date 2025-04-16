@@ -10,30 +10,46 @@ from collections import defaultdict
 from utils.numpy_utils import numpy_random_seed
 
 
-def get_cifar_100_transform():
+def get_train_transform():
     transform = transforms.Compose(
         [
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(32, padding=4),
-            transforms.Resize(
-                224
-            ),  # resize to 224 x 224 (required by ViT) # TODO clarify
+            transforms.Resize(224),  # resize to 224 x 224 (required by ViT)
             transforms.ToTensor(),
-            transforms.Normalize([0.5071, 0.4865, 0.4409], [0.2673, 0.2564, 0.2762]),
+            # Imagenet normalization
+            # DINO model has learned features from ImageNet, so during fine-tuning on CIFAR-100,
+            # the model will expect inputs to be normalized in the same way as during pretraining.
+            # TODO check this is correct
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
     )
-    return (
-        transform  # TODO are we allowed to use mean/std for cifar_100 normalization??
+    return transform
+
+
+def get_test_tranform():
+    transform = transforms.Compose(
+        [
+            transforms.Resize(224),  # resize to 224 x 224 (required by ViT)
+            transforms.ToTensor(),
+            # Imagenet normalization
+            # DINO model has learned features from ImageNet, so during fine-tuning on CIFAR-100,
+            # the model will expect inputs to be normalized in the same way as during pretraining.
+            # TODO check this is correct
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        ]
     )
+    return transform
 
 
 def get_cifar_100_datasets():
-    transform = get_cifar_100_transform()
+    train_transform = get_train_transform()
+    test_transform = get_test_tranform()
     trainset = torchvision.datasets.CIFAR100(
-        root="./data", train=True, download=True, transform=transform
+        root="./data", train=True, download=True, transform=train_transform
     )
     testset = torchvision.datasets.CIFAR100(
-        root="./data", train=False, download=True, transform=transform
+        root="./data", train=False, download=True, transform=test_transform
     )
     return trainset, testset
 
