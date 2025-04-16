@@ -30,7 +30,7 @@ def objective(trial: optuna.trial.Trial):
     learning_rate = trial.suggest_float("learning_rate", 1e-4, 1e-2, log=True)
 
     params = TrainingParams(
-        training_name=f"centralized_baseline_momentum_{momentum}_wdecay_{weight_decay}_lr_{learning_rate}_cosineLR",
+        training_name=f"centralized_baseline_momentum_{momentum:.2f}_wdecay_{weight_decay:.2f}_lr_{learning_rate:.2f}_cosineLR",
         model=model,
         loss_function=nn.CrossEntropyLoss(),
         learning_rate=learning_rate,
@@ -62,13 +62,13 @@ def run_single(*, lr=1e-3, momentum=0.9, weight_decay=5e-4, batch_size=64):
     train_dataloader, val_dataloader = get_cifar_dataloaders(batch_size=batch_size)
     model = get_dino_backbone_model()
     params = TrainingParams(
-        training_name=f"centralized_baseline_bs_{batch_size}_momentum_{momentum}_wdecay_{weight_decay}_lr_{lr}_cosineLR",
+        training_name=f"centralized_baseline_bs_{batch_size}_momentum_{momentum:.2f}_wdecay_{weight_decay:.2f}_lr_{lr:.2f}_cosineLR",
         model=model,
         loss_function=nn.CrossEntropyLoss(),
         learning_rate=lr,
         optimizer_class=torch.optim.SGD,  # type: ignore
         scheduler_class=torch.optim.lr_scheduler.CosineAnnealingLR,  # type: ignore
-        epochs=5,
+        epochs=10,
         optimizer_params={"momentum": momentum, "weight_decay": weight_decay},
         scheduler_params={"T_max": 20},
     )
