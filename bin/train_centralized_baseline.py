@@ -12,12 +12,17 @@ from dataset.cifar_100 import (
 from models.dino_backbone import get_dino_backbone_model
 
 
-def objective(trial: optuna.trial.Trial):
+def get_cifar_dataloaders(batch_size=None):
     trainset, _ = get_cifar_100_datasets()
     trainset, valset = get_cifar_100_train_valset_datasets(trainset)
     train_dataloader, val_dataloader = get_cifar_dataloader(
-        trainset
-    ), get_cifar_dataloader(valset)
+        trainset, batch_size=batch_size
+    ), get_cifar_dataloader(valset, batch_size=batch_size)
+    return train_dataloader, val_dataloader
+
+
+def objective(trial: optuna.trial.Trial):
+    train_dataloader, val_dataloader = get_cifar_dataloaders()
     model = get_dino_backbone_model()
 
     momentum = trial.suggest_float("momentum", 0.8, 0.99)
@@ -53,5 +58,29 @@ def optimize():
     print("Best accuracy:", study.best_value)
 
 
+def run_single(*, lr=1e-3, momentum=0.9, weight_decay=5e-4, batch_size=64):
+    train_dataloader, val_dataloader = get_cifar_dataloaders(batch_size=batch_size)
+    model = get_dino_backbone_model()
+    params = TrainingParams(
+        training_name=f"centralized_baseline_bs_{batch_size}_momentum_{momentum}_wdecay_{weight_decay}_lr_{lr}_cosineLR",
+        model=model,
+        loss_function=nn.CrossEntropyLoss(),
+        learning_rate=lr,
+        optimizer_class=torch.optim.SGD,  # type: ignore
+        scheduler_class=torch.optim.lr_scheduler.CosineAnnealingLR,  # type: ignore
+        epochs=5,
+        optimizer_params={"momentum": momentum, "weight_decay": weight_decay},
+        scheduler_params={"T_max": 20},
+    )
+    best_acc = train_model(
+        training_params=params,
+        train_loader=train_dataloader,
+        val_loader=val_dataloader,
+        project_name="fl_centralized_baseline",
+    )
+    return best_acc
+
+
 if __name__ == "__main__":
-    optimize()
+    # optimize()
+    run_single()
