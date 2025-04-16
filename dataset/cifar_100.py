@@ -13,6 +13,8 @@ from utils.numpy_utils import numpy_random_seed
 def get_cifar_100_transform():
     transform = transforms.Compose(
         [
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomCrop(32, padding=4),
             transforms.Resize(
                 224
             ),  # resize to 224 x 224 (required by ViT) # TODO clarify
