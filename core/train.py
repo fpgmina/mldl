@@ -46,13 +46,13 @@ def _train(
         loss.backward()
         optimizer.step()
 
-        if scheduler is not None:
-            scheduler.step()
-
         running_loss += loss.item()
         _, predicted = preds.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
+
+    if scheduler is not None:
+        scheduler.step()
 
     train_loss = running_loss / len(train_loader)
     train_accuracy = 100.0 * correct / total

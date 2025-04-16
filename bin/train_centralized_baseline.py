@@ -20,9 +20,9 @@ def objective(trial: optuna.trial.Trial):
     ), get_cifar_dataloader(valset)
     model = get_dino_backbone_model()
 
-    momentum = trial.suggest_float("momentum", 0.5, 0.99)
+    momentum = trial.suggest_float("momentum", 0.8, 0.99)
     weight_decay = trial.suggest_float("weight_decay", 1e-5, 1e-3, log=True)
-    learning_rate = trial.suggest_float("learning_rate", 1e-5, 1e-2, log=True)
+    learning_rate = trial.suggest_float("learning_rate", 1e-4, 1e-2, log=True)
 
     params = TrainingParams(
         training_name=f"centralized_baseline_momentum_{momentum}_wdecay_{weight_decay}_lr_{learning_rate}_cosineLR",
