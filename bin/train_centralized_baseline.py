@@ -1,4 +1,4 @@
-import optuna.trial
+import optuna
 import torch
 import torch.nn as nn
 
