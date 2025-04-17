@@ -1,11 +1,14 @@
-from typing import Optional
+from collections import defaultdict
+from typing import Optional, Dict, List
 from pathlib import Path
 import os
 import numpy as np
 import torch
 import torch.utils.data
 from torch import nn
-from torch.utils.data import Subset, DataLoader
+from torch.utils.data import Subset, DataLoader, Dataset
+
+from utils.numpy_utils import numpy_random_seed
 
 
 def get_device() -> torch.device:
@@ -81,3 +84,48 @@ def load_checkpoint(
     epoch = checkpoint["epoch"]
     loss = checkpoint["loss"]
     return model, optimizer, epoch, loss
+
+
+def iid_sharding(
+    dataset: Dataset, num_clients: int, seed: Optional[int] = 42
+) -> Dict[int, List[int]]:
+    # Split the dataset into num_clients equal parts, each with samples from all classes
+    data_len = len(dataset)  # type: ignore
+    with numpy_random_seed(seed):
+        indices = np.random.permutation(data_len)
+    client_data = defaultdict(list)
+
+    for i in range(data_len):
+        client_id = i % num_clients
+        client_data[client_id].append(indices[i])
+
+    return client_data
+
+
+def non_iid_sharding(
+    dataset: Dataset,
+    num_clients: int,
+    num_classes: int,
+    seed: Optional[int] = 42,
+) -> Dict[int, List[int]]:
+    # Split the dataset into K parts with non-i.i.d. distribution
+    client_data = defaultdict(list)
+    class_indices = defaultdict(list)
+
+    # Group data points by class
+    for idx, (_, label) in enumerate(dataset):  # type: ignore
+        class_indices[label].append(idx)
+
+    # Distribute classes to clients
+    classes = list(class_indices.keys())
+    with numpy_random_seed(seed):
+        np.random.shuffle(classes)
+
+    class_per_client = num_classes  # Number of classes per client
+
+    for i in range(num_clients):
+        selected_classes = classes[i * class_per_client : (i + 1) * class_per_client]
+        for c in selected_classes:
+            client_data[i].extend(class_indices[c])
+
+    return client_data
