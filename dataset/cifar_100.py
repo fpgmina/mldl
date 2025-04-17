@@ -111,24 +111,24 @@ def non_iid_sharding(
     return client_data
 
 
-def get_cifar_dataloader(
+def get_dataloader(
     dataset: Dataset,
     indices: Optional[List[int]] = None,
     batch_size: Optional[int] = None,
     shuffle: bool = True,
 ) -> DataLoader:
     """
-    Return a DataLoader for the CIFAR dataset, optionally using a subset of the data.
+    Return a DataLoader for a given dataset, optionally using a subset of the data.
 
     Args:
-        dataset (Dataset): The CIFAR dataset to be loaded.
+        dataset (Dataset): The dataset to be loaded.
         indices (List[int], optional): A list of indices to create a subset of the dataset. If None, the entire dataset is used. Defaults to None.
         batch_size (int, optional): The number of samples per batch. Defaults to None.
         shuffle (bool, optional): Whether to shuffle the data at the beginning of each epoch. Defaults to True.
             NB Should be set to False for test dataset and to True for train/val datasets.
 
     Returns:
-        DataLoader: A DataLoader for the CIFAR dataset, potentially using a subset of the data.
+        DataLoader: A DataLoader for the given dataset, potentially using a subset of the data.
     """
     batch_size = batch_size or 32  # if batch_size is None, use 32
     if indices is not None:
@@ -148,10 +148,10 @@ if __name__ == "__main__":
     iid_client_data = iid_sharding(trainset, K)
     non_iid_client_data = non_iid_sharding(trainset, K, num_classes)
 
-    client_0_iid_loader = get_cifar_dataloader(
+    client_0_iid_loader = get_dataloader(
         trainset, iid_client_data[0], shuffle=True
     )
-    client_0_non_iid_data = get_cifar_dataloader(
+    client_0_non_iid_data = get_dataloader(
         trainset, non_iid_client_data[0], shuffle=True
     )
     val_loader = DataLoader(valset, batch_size=32, shuffle=False)
