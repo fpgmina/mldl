@@ -72,13 +72,13 @@ def run_single(*, lr=1e-3, momentum=0.9, weight_decay=5e-4, batch_size=64):
         optimizer_params={"momentum": momentum, "weight_decay": weight_decay},
         scheduler_params={"T_max": 20},
     )
-    best_acc = train_model(
+    res_dict = train_model(
         training_params=params,
         train_loader=train_dataloader,
         val_loader=val_dataloader,
         project_name="fl_centralized_baseline",
     )
-    return best_acc
+    return res_dict["best_accuracy"]
 
 
 if __name__ == "__main__":

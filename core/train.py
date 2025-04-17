@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Optional
+from typing import Optional, Dict, Union
 
 import torch
 from torch import nn
@@ -124,7 +124,21 @@ def train_model(
     train_loader: DataLoader,
     val_loader: Optional[DataLoader] = None,
     project_name: str = "mldl",
-) -> float:
+) -> Dict[str, Union[torch.nn.Module, float]]:
+    """
+    Train a pytorch-based model with the given training parameters and data loaders.
+
+    Args:
+        training_params (TrainingParams): Training parameters including model, optimizer, loss function, and scheduler.
+        train_loader (DataLoader): PyTorch DataLoader for the training dataset.
+        val_loader (Optional[DataLoader], optional): PyTorch DataLoader for the validation dataset, defaults to None.
+        project_name (str, optional): Name of the WandB project, defaults to "mldl".
+
+    Returns:
+        Dict[str, torch.nn.Module, float]: A dictionary containing the trained model and the best validation accuracy.
+            - 'model' (torch.nn.Module): The trained model.
+            - 'best_accuracy' (float): The highest validation accuracy achieved during training.
+    """
 
     assert isinstance(training_params, TrainingParams)
     assert isinstance(train_loader, torch.utils.data.DataLoader)
@@ -192,7 +206,9 @@ def train_model(
                 wandb.save(model_name)
 
     wandb.finish()
-    return best_acc
+
+    res_dict = {"model": model, "best_accuracy": best_acc}
+    return res_dict
 
 
 def train_on_subset(training_params, train_loader, val_loader=None, epochs=2, **kwargs):
