@@ -15,11 +15,11 @@ def numpy_random_seed(seed: Optional[int] = None):
     # get the current random state
     old_state = np.random.get_state()
 
-    # Set the new random state with the given seed (None will make it non-deterministic)
+    # set the new random state
     np.random.seed(seed)
 
     try:
         yield
     finally:
-        # Restore the old state
+        # restore the old state
         np.random.set_state(old_state)
