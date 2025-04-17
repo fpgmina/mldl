@@ -14,7 +14,7 @@ class SparseSGDM(SGD):
         momentum: float = 0.9,
         dampening: float = 0.0,  # Dampening factor (0 for no dampening)
         weight_decay: float = 0.0,  # L2 penalty (weight decay)
-        nesterov: bool = False, # Whether to use Nesterov momentum
+        nesterov: bool = False,  # Whether to use Nesterov momentum
     ):
         """
         SparseSGDM extends SGD to apply a gradient mask.
