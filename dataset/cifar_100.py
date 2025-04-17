@@ -101,9 +101,7 @@ if __name__ == "__main__":
     iid_client_data = iid_sharding(trainset, K)
     non_iid_client_data = non_iid_sharding(trainset, K, num_classes)
 
-    client_0_iid_loader = get_dataloader(
-        trainset, iid_client_data[0], shuffle=True
-    )
+    client_0_iid_loader = get_dataloader(trainset, iid_client_data[0], shuffle=True)
     client_0_non_iid_data = get_dataloader(
         trainset, non_iid_client_data[0], shuffle=True
     )
