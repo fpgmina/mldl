@@ -42,7 +42,7 @@ def get_test_tranform():
     return transform
 
 
-def get_cifar_100_datasets():
+def get_cifar_100_datasets() -> Tuple[Dataset, Dataset]:
     train_transform = get_train_transform()
     test_transform = get_test_tranform()
     trainset = torchvision.datasets.CIFAR100(
