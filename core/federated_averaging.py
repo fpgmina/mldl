@@ -31,7 +31,7 @@ def federated_averaging(
 
     The function averages the weights of the provided client models and updates the global model.
 
-    Parameters:
+    Args:
     - global_model (torch.nn.Module): The global model that will be updated.
     - client_models (List[torch.nn.Module]): A list of client models whose weights will be averaged.
 
