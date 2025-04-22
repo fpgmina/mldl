@@ -13,7 +13,7 @@ import copy
 from tqdm import tqdm
 
 from core.train import train_model, compute_predictions
-from core.train_params import TrainingParams
+from core.train_params import TrainingParams, is_nn_module
 from dataset.cifar_100 import get_dataloader
 from utils.model_utils import iid_sharding, non_iid_sharding
 from utils.numpy_utils import numpy_random_seed
@@ -65,7 +65,7 @@ def federated_averaging(
 
 @attr.s
 class FederatedAveraging:
-    global_model: torch.nn.Module = attr.ib()
+    global_model: torch.nn.Module = attr.ib(validator=is_nn_module)
     trainset: Dataset = attr.ib(validator=attr.validators.instance_of(Dataset))
     valset: Dataset = attr.ib(validator=attr.validators.instance_of(Dataset))
     client_training_params: TrainingParams = attr.ib(
