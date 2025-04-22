@@ -124,6 +124,8 @@ def train_model(
     train_loader: DataLoader,
     val_loader: Optional[DataLoader] = None,
     project_name: str = "mldl",
+    wandb_log: bool = True,
+    wandb_save: bool = True,
 ) -> Dict[str, Union[torch.nn.Module, float]]:
     """
     Train a pytorch-based model with the given training parameters and data loaders.
@@ -133,6 +135,8 @@ def train_model(
         train_loader (DataLoader): PyTorch DataLoader for the training dataset.
         val_loader (Optional[DataLoader], optional): PyTorch DataLoader for the validation dataset, defaults to None.
         project_name (str, optional): Name of the WandB project, defaults to "mldl".
+        wandb_log (bool): Use wandb to log training output, otherwise do not log. Defaults to True.
+        wandb_save (bool): Use wandb to save trained model, otherwise do not save. Defaults to True.
 
     Returns:
         Dict[str, torch.nn.Module, float]: A dictionary containing the trained model and the best validation accuracy.

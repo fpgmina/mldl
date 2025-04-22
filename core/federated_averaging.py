@@ -165,6 +165,8 @@ class FederatedAveraging:
                     val_loader=val_loader,
                     project_name=self._training_session_name
                     + f"_mom_{self._momentum:.2f}_decay_{self._weight_decay:.3f}_lr_{self._lr:.2f}",
+                    wandb_log=False,
+                    wandb_save=False,
                 )
                 logging.info(f"Best accuracy: {res_dict['best_accuracy']}")
                 client_models.append(res_dict["model"])
