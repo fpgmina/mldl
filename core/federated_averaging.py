@@ -140,7 +140,7 @@ class FederatedAveraging:
         optimizer_params = self.client_training_params.optimizer_params
         _training_session_name = self._training_session_name or "fl"
         return (
-            self._training_session_name
+            _training_session_name
             + f"_mom_{optimizer_params.get('momentum'):.2f}_decay_{optimizer_params.get('weight_decay'):.3f}_lr"
             + f"_{self.client_training_params.learning_rate:.2f}_{self.sharding_type.name}"
         )
