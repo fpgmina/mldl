@@ -90,6 +90,15 @@ def get_dataloader(
     return loader
 
 
+def get_cifar_dataloaders(batch_size=None):
+    trainset, _ = get_cifar_100_datasets()
+    trainset, valset = get_cifar_100_train_valset_datasets(trainset)
+    train_dataloader, val_dataloader = get_dataloader(
+        trainset, batch_size=batch_size
+    ), get_dataloader(valset, batch_size=batch_size)
+    return train_dataloader, val_dataloader
+
+
 if __name__ == "__main__":
 
     K = 10  # Number of clients

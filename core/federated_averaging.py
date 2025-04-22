@@ -91,7 +91,7 @@ class FederatedAveraging:
             ), f"num_classes cannot be None for {self.sharding_type.name}"
 
     def get_client_data(
-        self, seed
+        self, seed: int
     ) -> Tuple[Dict[int, List[int]], Dict[int, List[int]]]:
         if self.sharding_type == ShardingType.IID:
             train_client_data = iid_sharding(

@@ -5,20 +5,9 @@ import torch.nn as nn
 from core.train import train_model
 from core.train_params import TrainingParams
 from dataset.cifar_100 import (
-    get_cifar_100_datasets,
-    get_cifar_100_train_valset_datasets,
-    get_dataloader,
+    get_cifar_dataloaders,
 )
 from models.dino_backbone import get_dino_backbone_model
-
-
-def get_cifar_dataloaders(batch_size=None):
-    trainset, _ = get_cifar_100_datasets()
-    trainset, valset = get_cifar_100_train_valset_datasets(trainset)
-    train_dataloader, val_dataloader = get_dataloader(
-        trainset, batch_size=batch_size
-    ), get_dataloader(valset, batch_size=batch_size)
-    return train_dataloader, val_dataloader
 
 
 def objective(trial: optuna.trial.Trial):
