@@ -123,7 +123,7 @@ def train_model(
     training_params: TrainingParams,
     train_loader: DataLoader,
     val_loader: Optional[DataLoader] = None,
-    project_name: str = "mldl",
+    project_name: Optional[str] = None,
     wandb_log: bool = True,
     wandb_save: bool = True,
 ) -> Dict[str, Union[torch.nn.Module, float]]:
@@ -148,7 +148,14 @@ def train_model(
     assert isinstance(train_loader, torch.utils.data.DataLoader)
     assert isinstance(val_loader, torch.utils.data.DataLoader)
 
-    if wandb_log or wandb_save:
+    use_wandb = wandb_log or wandb_save
+    if use_wandb:
+        if project_name is None:
+            raise ValueError(
+                "project name cannot be None with either wandb_log or wandb_save set to True."
+            )
+
+    if use_wandb:
         wandb.init(
             project=project_name,
             name=training_params.training_name,
@@ -218,7 +225,7 @@ def train_model(
                     torch.save(model.state_dict(), model_name)
                     wandb.save(model_name)
 
-    if wandb_log or wandb_save:
+    if use_wandb:
         wandb.finish()
 
     res_dict = {"model": model, "best_accuracy": best_acc}
