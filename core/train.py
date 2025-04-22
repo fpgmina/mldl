@@ -135,7 +135,7 @@ def train_model(
         train_loader (DataLoader): PyTorch DataLoader for the training dataset.
         val_loader (Optional[DataLoader], optional): PyTorch DataLoader for the validation dataset, defaults to None.
         project_name (str, optional): Name of the WandB project, defaults to "mldl".
-        wandb_log (bool): Use wandb to log training output, otherwise do not log. Defaults to True.
+        wandb_log (bool): Use wandb to log training output, otherwise fallback to default logger. Defaults to True.
         wandb_save (bool): Use wandb to save trained model, otherwise do not save. Defaults to True.
 
     Returns:
@@ -148,19 +148,20 @@ def train_model(
     assert isinstance(train_loader, torch.utils.data.DataLoader)
     assert isinstance(val_loader, torch.utils.data.DataLoader)
 
-    wandb.init(
-        project=project_name,
-        name=training_params.training_name,
-        config={
-            "epochs": training_params.epochs,
-            "batch_size": train_loader.batch_size,
-            "learning_rate": training_params.learning_rate,
-            "architecture": training_params.model.__class__.__name__,
-            "optimizer_class": training_params.optimizer_class.__name__,
-            "loss_function": training_params.loss_function.__class__.__name__,
-            **(training_params.optimizer_params or {}),
-        },
-    )
+    if wandb_log or wandb_save:
+        wandb.init(
+            project=project_name,
+            name=training_params.training_name,
+            config={
+                "epochs": training_params.epochs,
+                "batch_size": train_loader.batch_size,
+                "learning_rate": training_params.learning_rate,
+                "architecture": training_params.model.__class__.__name__,
+                "optimizer_class": training_params.optimizer_class.__name__,
+                "loss_function": training_params.loss_function.__class__.__name__,
+                **(training_params.optimizer_params or {}),
+            },
+        )
     device = get_device()
     model = training_params.model.to(device)
     loss_func = training_params.loss_function
@@ -178,38 +179,47 @@ def train_model(
             optimizer=optimizer,
             scheduler=scheduler,
         )
-        # Log core metrics to wandb
-        wandb.log(
-            {"Epoch": epoch, "Train Loss": train_loss, "Train Accuracy": train_accuracy}
-        )
-        logging.info(
-            f"Epoch: {epoch}: Train Loss: {train_loss}, Train Accuracy: {train_accuracy}"
-        )
+        if wandb_log:
+            # Log core metrics to wandb
+            wandb.log(
+                {
+                    "Epoch": epoch,
+                    "Train Loss": train_loss,
+                    "Train Accuracy": train_accuracy,
+                }
+            )
+        else:
+            logging.info(
+                f"Epoch: {epoch}: Train Loss: {train_loss}, Train Accuracy: {train_accuracy}"
+            )
 
         if val_loader:
             _, _, val_loss, val_accuracy = compute_predictions(
                 model=model, dataloader=val_loader, loss_function=loss_func
             )
-
-            wandb.log(
-                {
-                    "Epoch": epoch,
-                    "Validation Loss": val_loss,
-                    "Validation Accuracy": val_accuracy,
-                }
-            )
-            logging.info(
-                f"Epoch: {epoch}: Validation Loss: {val_loss}, Validation Accuracy: {val_accuracy}"
-            )
+            if wandb_log:
+                wandb.log(
+                    {
+                        "Epoch": epoch,
+                        "Validation Loss": val_loss,
+                        "Validation Accuracy": val_accuracy,
+                    }
+                )
+            else:
+                logging.info(
+                    f"Epoch: {epoch}: Validation Loss: {val_loss}, Validation Accuracy: {val_accuracy}"
+                )
 
             # Save the model with the best validation accuracy
             if val_accuracy > best_acc:
                 best_acc = val_accuracy
-                model_name = f"{training_params.training_name}_best.pth"
-                torch.save(model.state_dict(), model_name)
-                wandb.save(model_name)
+                if wandb_save:
+                    model_name = f"{training_params.training_name}_best.pth"
+                    torch.save(model.state_dict(), model_name)
+                    wandb.save(model_name)
 
-    wandb.finish()
+    if wandb_log or wandb_save:
+        wandb.finish()
 
     res_dict = {"model": model, "best_accuracy": best_acc}
     return res_dict
