@@ -243,6 +243,7 @@ class FederatedAveraging:
             train_loss, train_accuracy, val_loss, val_accuracy = self._evaluate()
             wandb.log(
                 {
+                    "Round": r,
                     "Train Loss": train_loss,
                     "Train Accuracy": train_accuracy,
                     "Validation Loss": val_loss,
