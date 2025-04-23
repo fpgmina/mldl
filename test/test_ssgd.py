@@ -22,7 +22,9 @@ def test_sparse_sgdm_step(tiny_mlp):
 
     named_params = {name: param for name, param in model.named_parameters()}
 
-    optimizer = SparseSGDM(named_params=named_params, grad_mask=mask, lr=0.01)
+    optimizer = SparseSGDM(
+        model.parameters(), named_params=named_params, grad_mask=mask, lr=0.01
+    )
 
     model.train()
     for inputs, targets in dataloader:
@@ -32,7 +34,9 @@ def test_sparse_sgdm_step(tiny_mlp):
         loss.backward()
 
         # Clone grads before step
-        grads_before = {n: p.grad.clone() for n, p in model.named_parameters() if p.grad is not None}
+        grads_before = {
+            n: p.grad.clone() for n, p in model.named_parameters() if p.grad is not None
+        }
 
         optimizer.step()
 
@@ -41,4 +45,6 @@ def test_sparse_sgdm_step(tiny_mlp):
             if param.grad is not None and name in mask:
                 masked_grad = grads_before[name] * mask[name]
                 actual_grad = param.grad  # After masking step
-                assert torch.allclose(actual_grad, masked_grad), f"Mask not correctly applied to {name}"
+                assert torch.allclose(
+                    actual_grad, masked_grad
+                ), f"Mask not correctly applied to {name}"

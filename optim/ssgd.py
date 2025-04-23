@@ -1,6 +1,6 @@
 import torch
 from torch.optim import SGD
-from typing import Dict
+from typing import Dict, Iterable
 
 
 class SparseSGDM(SGD):
@@ -35,16 +35,18 @@ class SparseSGDM(SGD):
 
     def __init__(
         self,
-        named_params: Dict[str, torch.nn.Parameter],  # name -> param
-        grad_mask: Dict[str, torch.Tensor],
+        params: Iterable[torch.nn.Parameter],
         lr: float = 0.01,
         momentum: float = 0.9,
         dampening: float = 0.0,
         weight_decay: float = 0.0,
         nesterov: bool = False,
+        *,
+        grad_mask: Dict[str, torch.Tensor],
+        named_params: Dict[str, torch.nn.Parameter],
     ):
         super(SparseSGDM, self).__init__(
-            named_params.values(),
+            params,
             lr=lr,
             momentum=momentum,
             dampening=dampening,
@@ -52,6 +54,7 @@ class SparseSGDM(SGD):
             nesterov=nesterov,
         )
         self.named_params = named_params
+        self.param_id_to_name = {id(p): n for n, p in named_params.items()}
         self.grad_mask = grad_mask
 
     def step(self, closure=None):
@@ -60,10 +63,8 @@ class SparseSGDM(SGD):
 
         for group in self.param_groups:
             for param in group["params"]:
-                # Find the parameter name
-                name = next(
-                    key for key, val in self.named_params.items() if val is param
-                )
+                # Applying the gradient mask only if that name is in the mask
+                name = self.param_id_to_name.get(id(param))
                 if param.grad is not None and name in self.grad_mask:
                     param.grad.data *= self.grad_mask[name]
 
