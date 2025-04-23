@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-from typing import Optional, List
+from typing import Dict, Optional
 
 from utils.model_utils import get_device
 
@@ -95,25 +95,32 @@ def compute_fisher_diagonal(
 
 def create_fisher_mask(
     fisher_diag: torch.Tensor, model: nn.Module, keep_ratio: float = 0.2
-) -> List[torch.Tensor]:
+) -> Dict[str, torch.Tensor]:
     """
-    Generate a binary mask for gradients, keeping only the top-k Fisher scores.
+    Create a dictionary of binary gradient masks based on Fisher importance scores.
+
+    Keeps the top-k% most important parameters (based on the Fisher Information diagonal),
+    and masks the rest (sets their gradients to zero during training).
 
     Args:
-        fisher_diag: Flattened Fisher information scores.
-        model: Model whose parameters the mask will align with.
-        keep_ratio: Fraction of weights to keep (e.g., 0.2 = top 20%).
+        fisher_diag (torch.Tensor): Flattened tensor of Fisher Information scores (1D).
+        model (nn.Module): The model whose parameters will be masked.
+        keep_ratio (float): Fraction of total parameters to keep (set mask=1).
 
     Returns:
-        List of binary masks shaped like each model parameter.
+        Dict[str, torch.Tensor]: Dictionary mapping parameter names to binary masks
+                                 with the same shape as the parameter tensors.
     """
     k = int(len(fisher_diag) * keep_ratio)
     threshold = torch.topk(fisher_diag, k, largest=True).values[-1]
     flat_mask = (fisher_diag >= threshold).float()
 
-    param_shapes = [p.shape for p in model.parameters()]
-    param_sizes = [p.numel() for p in model.parameters()]
+    param_sizes = [p.numel() for _, p in model.named_parameters()]
+    param_shapes = [p.shape for _, p in model.named_parameters()]
+    param_names = [name for name, _ in model.named_parameters()]
     split_masks = torch.split(flat_mask, param_sizes)
-    shaped_masks = [m.view(shape) for m, shape in zip(split_masks, param_shapes)]
 
-    return shaped_masks
+    return {
+        name: mask.view(shape)
+        for name, mask, shape in zip(param_names, split_masks, param_shapes)
+    }
