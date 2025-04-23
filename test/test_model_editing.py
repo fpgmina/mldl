@@ -16,7 +16,7 @@ def test_compute_fisher_diagonal(tiny_cnn):
 
     fisher_diag = compute_fisher_diagonal(model, dataloader, loss_fn, num_batches=2)
 
-    total_params = sum(p.numel() for p in model.parameters())
+    total_params = sum(p.numel() for p in model.parameters()) # 1490
     assert isinstance(fisher_diag, torch.Tensor)
     assert fisher_diag.ndim == 1
     assert fisher_diag.numel() == total_params
