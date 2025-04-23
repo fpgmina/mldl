@@ -30,8 +30,30 @@ def compute_fisher_diagonal(
     """
     Compute the diagonal of the Fisher Information Matrix using squared gradients.
 
+    The Fisher Information is given by the expected value of the squared gradient of the loss function:
+
+        Fisher(θ) = E_{(x, y) ~ D} [ (∂L(f_θ(x), y) / ∂θ)^2 ]
+
+    This function approximates and returns the diagonal of the Fisher Information Matrix:
+
+        Fisher(θ) ≈ (1 / N) * ∑_{i=1}^{N} (∇_θ L^{(i)}(θ))²
+
+    Where:
+        - L^{(i)}(θ) is the loss on the i-th data point
+        - ∇_θ L^{(i)}(θ) is the gradient of the loss with respect to parameters θ
+        - N is the number of samples (or mini-batches)
+        - The square is element-wise and gives the diagonal approximation
+
+    Args:
+        model (nn.Module): The model whose parameters are being analyzed.
+        dataloader (DataLoader): DataLoader providing input–target pairs.
+        loss_fn (nn.Module): Loss function used to compute gradients.
+        num_batches (Optional[int]): If set, only the first `num_batches` are used
+            to estimate the Fisher information. Useful for faster computation.
+
     Returns:
-        fisher_diag (Tensor): Flattened tensor of Fisher Information scores (1D).
+        fisher_diag (torch.Tensor): A flattened tensor containing the Fisher diagonal estimate,
+        one element per parameter.
     """
     model.eval()
     fisher_diag = None
