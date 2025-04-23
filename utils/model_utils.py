@@ -166,9 +166,14 @@ def non_iid_sharding(
 
 
 def non_idd_dirichlet(
-    dataset: Dataset, num_clients: int, num_classes: int, alpha: Optional[int] = 0.5
+    dataset: Dataset,
+    num_clients: int,
+    num_classes: int,
+    alpha: Optional[int] = 0.5,
+    seed: int = 42,
 ):
 
+    rng = np.random.default_rng(seed=seed)
     client_data = {i: [] for i in range(num_clients)}
 
     class_indices = defaultdict(list)
@@ -182,7 +187,7 @@ def non_idd_dirichlet(
         if not indices_for_class:
             continue
 
-        props = np.random.dirichlet([alpha] * num_clients)
+        props = rng.dirichlet([alpha] * num_clients)
 
         num_samples = len(indices_for_class)
         samples_per_client = [int(p * num_samples) for p in props]
@@ -195,7 +200,7 @@ def non_idd_dirichlet(
             props[client_idx] = 0
             remaining -= 1
 
-        random.shuffle(indices_for_class)
+        rng.shuffle(indices_for_class)
 
         start_idx = 0
         for client in range(num_clients):
@@ -204,6 +209,6 @@ def non_idd_dirichlet(
             start_idx = end_idx
 
     for client in range(num_clients):
-        random.shuffle(client_data[client])
+        rng.shuffle(client_data[client])
 
     return client_data
