@@ -9,7 +9,7 @@ from torch import nn
 from torch.utils.data import Subset, DataLoader, Dataset
 
 from utils.numpy_utils import numpy_random_seed
-
+import random
 
 def get_device() -> torch.device:
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -162,3 +162,44 @@ def non_iid_sharding(
             client_data[client_id].extend(samples)
 
     return dict(client_data)
+
+def non_idd_dirichlet(dataset, num_clients, num_classes, alpha=0.5):
+      
+    client_data = {i: [] for i in range(num_clients)}
+    
+    class_indices = defaultdict(list)
+
+    for idx, (_, label) in enumerate(dataset):
+        class_indices[label].append(idx)
+  
+    for c in range(num_classes):
+        indices_for_class = class_indices[c]
+        
+        if not indices_for_class:
+            continue
+            
+        props = np.random.dirichlet([alpha] * num_clients)
+        
+        num_samples = len(indices_for_class)
+        samples_per_client = [int(p * num_samples) for p in props]
+        
+        remaining = num_samples - sum(samples_per_client)
+        while remaining > 0:
+        
+            client_idx = np.argmax(props)
+            samples_per_client[client_idx] += 1
+            props[client_idx] = 0  
+            remaining -= 1
+        
+        random.shuffle(indices_for_class)
+        
+        start_idx = 0
+        for client in range(num_clients):
+            end_idx = start_idx + samples_per_client[client]
+            client_data[client].extend(indices_for_class[start_idx:end_idx])
+            start_idx = end_idx
+    
+    for client in range(num_clients):
+        random.shuffle(client_data[client])
+        
+    return client_data
