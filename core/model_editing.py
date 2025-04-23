@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-from typing import Optional
+from typing import Optional, List
 
 from utils.model_utils import get_device
 
@@ -91,3 +91,29 @@ def compute_fisher_diagonal(
 
     fisher_diag /= total_samples
     return fisher_diag
+
+
+def create_fisher_mask(
+    fisher_diag: torch.Tensor, model: nn.Module, keep_ratio: float = 0.2
+) -> List[torch.Tensor]:
+    """
+    Generate a binary mask for gradients, keeping only the top-k Fisher scores.
+
+    Args:
+        fisher_diag: Flattened Fisher information scores.
+        model: Model whose parameters the mask will align with.
+        keep_ratio: Fraction of weights to keep (e.g., 0.2 = top 20%).
+
+    Returns:
+        List of binary masks shaped like each model parameter.
+    """
+    k = int(len(fisher_diag) * keep_ratio)
+    threshold = torch.topk(fisher_diag, k, largest=True).values[-1]
+    flat_mask = (fisher_diag >= threshold).float()
+
+    param_shapes = [p.shape for p in model.parameters()]
+    param_sizes = [p.numel() for p in model.parameters()]
+    split_masks = torch.split(flat_mask, param_sizes)
+    shaped_masks = [m.view(shape) for m, shape in zip(split_masks, param_shapes)]
+
+    return shaped_masks
