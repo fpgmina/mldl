@@ -1,15 +1,15 @@
+import os
+import random
+import torch
 from collections import defaultdict
 from typing import Optional, Dict, List
 from pathlib import Path
-import os
 import numpy as np
-import torch
 import torch.utils.data
 from torch import nn
 from torch.utils.data import Subset, DataLoader, Dataset
 
 from utils.numpy_utils import numpy_random_seed
-import random
 
 
 def get_device() -> torch.device:
