@@ -8,7 +8,6 @@ import torch.utils.data
 from torch import nn
 from torch.utils.data import Subset, DataLoader, Dataset
 
-from utils.numpy_utils import numpy_random_seed
 
 
 def get_device() -> torch.device:
@@ -91,8 +90,8 @@ def iid_sharding(
 ) -> Dict[int, List[int]]:
     # Split the dataset into num_clients equal parts, each with samples from all classes
     data_len = len(dataset)  # type: ignore
-    with numpy_random_seed(seed):
-        indices = np.random.permutation(data_len)
+    rng = np.random.default_rng(seed=seed)
+    indices = rng.permutation(data_len)
     client_data = defaultdict(list)
 
     for i in range(data_len):
