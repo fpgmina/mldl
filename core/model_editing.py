@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-from typing import List, Optional
+from typing import Optional
 
 from utils.model_utils import get_device
 
