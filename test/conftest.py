@@ -1,6 +1,19 @@
 import pytest
 import torch
 from torch import nn
+from torch.utils.data import Dataset
+
+
+class SimpleDataset(Dataset):
+    def __init__(self, data, labels):
+        self.data = data
+        self.labels = labels
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx], self.labels[idx]
 
 
 class TinyMLP(nn.Module):
@@ -56,3 +69,33 @@ def tiny_cnn():
 @pytest.fixture
 def simple_cnn():
     return SimpleCNN()
+
+
+@pytest.fixture
+def model_and_optimizer():
+    # Create a simple model and optimizer for testing
+    class SimpleModel(nn.Module):
+        def __init__(self):
+            super(SimpleModel, self).__init__()
+            self.fc = nn.Linear(10, 10)
+
+        def forward(self, x):
+            return self.fc(x)
+
+    model = SimpleModel()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    return model, optimizer
+
+
+@pytest.fixture
+def binary_dataset():
+    data = [torch.tensor([i], dtype=torch.float32) for i in range(10)]
+    labels = [i % 2 for i in range(10)]  # binary labels
+    return SimpleDataset(data, labels)
+
+
+@pytest.fixture
+def ternary_dataset():
+    data = [i for i in range(12)]
+    labels = [i % 3 for i in range(12)]  # Three classes: 0, 1, and 2
+    return SimpleDataset(data, labels)

@@ -2,8 +2,6 @@ from typing import List
 
 import pytest
 from unittest.mock import MagicMock
-import torch
-import torch.nn as nn
 from pathlib import Path
 import os
 from torch.utils.data import Dataset
@@ -21,22 +19,6 @@ class SimpleDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.data[idx], self.labels[idx]
-
-
-@pytest.fixture
-def model_and_optimizer():
-    # Create a simple model and optimizer for testing
-    class SimpleModel(nn.Module):
-        def __init__(self):
-            super(SimpleModel, self).__init__()
-            self.fc = nn.Linear(10, 10)
-
-        def forward(self, x):
-            return self.fc(x)
-
-    model = SimpleModel()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    return model, optimizer
 
 
 @pytest.mark.parametrize("is_colab", [False])  # only test for local machine
@@ -65,14 +47,9 @@ def test_save_checkpoint_local(model_and_optimizer, is_colab):
     checkpoint_path.unlink()  # This deletes the file
 
 
-def test_iid_sharding():
-    # Create a small synthetic dataset
-    data = [i for i in range(10)]
-    labels = [i % 2 for i in range(10)]  # Two classes: 0 and 1
-    dataset = SimpleDataset(data, labels)
-
+def test_iid_sharding(binary_dataset):
     num_clients = 2
-    shard_data = iid_sharding(dataset, num_clients, seed=42)
+    shard_data = iid_sharding(binary_dataset, num_clients, seed=42)
 
     # Ensure correct number of clients
     assert (
@@ -86,19 +63,14 @@ def test_iid_sharding():
     # Ensure no data points are repeated and all are accounted for
     all_indices = sum(list(shard_data.values()), [])
     assert len(set(all_indices)) == len(
-        dataset
+        binary_dataset
     ), "Some data points are missing or duplicated in the sharded data"
 
 
-def test_non_iid_sharding():
-    # Create a small synthetic dataset with three classes
-    data = [i for i in range(12)]
-    labels = [i % 3 for i in range(12)]  # Three classes: 0, 1, and 2
-    dataset = SimpleDataset(data, labels)
-
+def test_non_iid_sharding(ternary_dataset):
     num_clients = 2
     num_classes = 2  # Each client will get 2 classes
-    shard_data = non_iid_sharding(dataset, num_clients, num_classes, seed=42)
+    shard_data = non_iid_sharding(ternary_dataset, num_clients, num_classes, seed=42)
 
     # Ensure correct number of clients
     assert (
@@ -107,7 +79,7 @@ def test_non_iid_sharding():
 
     # Ensure each client has data from 2 classes
     for client_id, indices in shard_data.items():
-        unique_labels = set(dataset[idx][1] for idx in indices)
+        unique_labels = set(ternary_dataset[idx][1] for idx in indices)
         assert (
             len(unique_labels) == 2
         ), f"Client {client_id} does not have data from exactly 2 classes"
@@ -115,20 +87,15 @@ def test_non_iid_sharding():
     # Ensure no data points are repeated and all are accounted for
     all_indices = sum(list(shard_data.values()), [])
     assert len(set(all_indices)) == len(
-        dataset
+        ternary_dataset
     ), "Some data points are missing or duplicated in the sharded data"
 
 
-def test_iid_reproducibility():
-    # Create a small synthetic dataset
-    data = [i for i in range(10)]
-    labels = [i % 2 for i in range(10)]  # Two classes: 0 and 1
-    dataset = SimpleDataset(data, labels)
-
+def test_iid_reproducibility(binary_dataset):
     num_clients = 2
     # Generate two shardings with the same seed
-    shard_data_1 = iid_sharding(dataset, num_clients, seed=42)
-    shard_data_2 = iid_sharding(dataset, num_clients, seed=42)
+    shard_data_1 = iid_sharding(binary_dataset, num_clients, seed=42)
+    shard_data_2 = iid_sharding(binary_dataset, num_clients, seed=42)
 
     # Assert that both shardings are the same (reproducibility)
     assert (
@@ -136,17 +103,12 @@ def test_iid_reproducibility():
     ), "Sharding results are not reproducible with the same seed"
 
 
-def test_non_iid_reproducibility():
-    # Create a small synthetic dataset with three classes
-    data = [i for i in range(12)]
-    labels = [i % 3 for i in range(12)]  # Three classes: 0, 1, and 2
-    dataset = SimpleDataset(data, labels)
-
+def test_non_iid_reproducibility(ternary_dataset):
     num_clients = 2
     num_classes = 2  # Each client will get 2 classes
     # Generate two shardings with the same seed
-    shard_data_1 = non_iid_sharding(dataset, num_clients, num_classes, seed=42)
-    shard_data_2 = non_iid_sharding(dataset, num_clients, num_classes, seed=42)
+    shard_data_1 = non_iid_sharding(ternary_dataset, num_clients, num_classes, seed=42)
+    shard_data_2 = non_iid_sharding(ternary_dataset, num_clients, num_classes, seed=42)
 
     # Assert that both shardings are the same (reproducibility)
     assert (
