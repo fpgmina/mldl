@@ -163,7 +163,7 @@ def non_iid_sharding(
 
     return dict(client_data)
 
-def non_idd_dirichlet(dataset, num_clients, num_classes, alpha=0.5):
+def non_idd_dirichlet(dataset: Dataset, num_clients: int, num_classes: int , alpha: Optional[int]=0.5):
       
     client_data = {i: [] for i in range(num_clients)}
     
