@@ -108,6 +108,8 @@ class FederatedAveraging:
         _num_classes (Optional[int]): Number of classes for non-IID sharding. Required if NON_IID.
         _seed (int): Base seed for reproducibility. Default is 42.
         _training_session_name (str): Base name for training and WandB logging.
+    Methods:
+        train: perform training using federated learning algorithm. 
     """
 
     def __attrs_post_init__(self):
