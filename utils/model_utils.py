@@ -165,7 +165,7 @@ def non_iid_sharding(
     return dict(client_data)
 
 
-def non_idd_dirichlet(
+def non_iid_dirichlet(
     dataset: Dataset,
     num_clients: int,
     num_classes: int,
