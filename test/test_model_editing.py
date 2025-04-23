@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
-from core.model_editing import compute_fisher_diagonal  # adjust import as needed
+from core.model_editing import compute_fisher_diagonal
 
 
 class TinyCNN(nn.Module):
