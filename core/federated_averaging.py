@@ -63,7 +63,7 @@ def federated_averaging(
     return global_model
 
 
-@attr.s
+@attr.s(kw_only=True)
 class FederatedAveraging:
     global_model: torch.nn.Module = attr.ib(validator=is_nn_module)
     trainset: Dataset = attr.ib(validator=attr.validators.instance_of(Dataset))
