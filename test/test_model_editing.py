@@ -16,7 +16,7 @@ def test_compute_fisher_diagonal(tiny_cnn):
 
     fisher_diag = compute_fisher_diagonal(model, dataloader, loss_fn, num_batches=2)
 
-    total_params = sum(p.numel() for p in model.parameters()) # 1490
+    total_params = sum(p.numel() for p in model.parameters())  # 1490
     assert isinstance(fisher_diag, torch.Tensor)
     assert fisher_diag.ndim == 1
     assert fisher_diag.numel() == total_params
@@ -35,18 +35,16 @@ def test_create_fisher_mask_shapes_and_counts(tiny_mlp):
     masks = create_fisher_mask(fisher_diag, model, keep_ratio=keep_ratio)
 
     # 1. Check correct number of masks
-    assert len(masks) == len(
-        list(model.parameters())
-    ), "Mask count must match parameter count"
+    param_names = [name for name, _ in model.named_parameters()]
+    assert set(masks.keys()) == set(param_names), "Mask keys must match parameter names"
 
-    # 2. Check that each mask shape matches its parameter
-    for p, m in zip(model.parameters(), masks):
-        assert (
-            p.shape == m.shape
-        ), f"Mask shape {m.shape} does not match param shape {p.shape}"
+    # 2. Check that each mask shape matches its corresponding parameter
+    for name, param in model.named_parameters():
+        assert name in masks, f"Missing mask for parameter: {name}"
+        assert masks[name].shape == param.shape, f"Shape mismatch for {name}"
 
-    # 3. Check that total number of ones matches expected top-k
-    total_ones = sum(mask.sum().item() for mask in masks)
+    # 3. Check total number of ones in all masks equals expected count
+    total_ones = sum(mask.sum().item() for mask in masks.values())
     expected_ones = int(total_params * keep_ratio)
     assert (
         total_ones == expected_ones
