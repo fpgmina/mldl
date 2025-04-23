@@ -16,7 +16,7 @@ def test_invalid_optimizer_class():
             learning_rate=0.001,
             model=model,
             loss_function=loss_function,
-            optimizer_class=nn.Linear,  # Invalid optimizer class
+            optimizer_class=nn.Linear,  # type: ignore # Invalid optimizer class
             optimizer_params={},
         )
 
