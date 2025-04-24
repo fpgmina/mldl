@@ -90,6 +90,42 @@ def test_non_iid_sharding(ternary_dataset):
         ternary_dataset
     ), "Some data points are missing or duplicated in the sharded data"
 
+def test_non_idd_dirichlet_sharding(ternary_dataset):
+    
+    num_clients = 5
+    num_classes = 3 # Matches ternary_dataset fixture
+    alpha = 0.5
+    seed = 123
+
+    client_data = non_iid_dirichlet(
+        dataset=ternary_dataset,
+        num_clients=num_clients,
+        num_classes=num_classes,
+        alpha=alpha,
+        seed=seed
+    )
+
+    # 1. Check structure: Correct number of clients
+    assert len(client_data) == num_clients, \
+        f"Expected {num_clients} clients, but got {len(client_data)}"
+
+    # 2. Check structure: Values are lists of integers (indices)
+    all_indices_collected = []
+    for client_id, indices in client_data.items():
+        assert isinstance(client_id, int), "Client ID is not an integer"
+        assert isinstance(indices, list), f"Data for client {client_id} is not a list"
+        if indices: # If list is not empty
+            assert all(isinstance(idx, int) for idx in indices), \
+                f"Indices for client {client_id} are not all integers"
+        all_indices_collected.extend(indices)
+
+    # 3. Check completeness: All dataset indices are assigned exactly once
+    assert len(all_indices_collected) == len(ternary_dataset), \
+        f"Total number of assigned indices ({len(all_indices_collected)}) does not match dataset size ({len(ternary_dataset)})"
+    assert len(set(all_indices_collected)) == len(all_indices_collected), \
+        "Duplicate indices found across clients"
+    assert set(all_indices_collected) == set(range(len(ternary_dataset))), \
+        "The set of assigned indices does not match the set of expected indices [0, ..., N-1]"
 
 def test_iid_reproducibility(binary_dataset):
     num_clients = 2
@@ -114,6 +150,7 @@ def test_non_iid_reproducibility(ternary_dataset):
     assert (
         shard_data_1 == shard_data_2
     ), "Sharding results are not reproducible with the same seed"
+
 
 def test_non_idd_dirichlet_reproducibility(ternary_dataset):
     """Tests if the function produces identical results with the same seed."""
