@@ -20,7 +20,8 @@ def test_sparse_sgdm_step(tiny_mlp):
     # Create binary masks
     mask = create_fisher_mask(fisher_diag, model, keep_ratio=0.2)
 
-    named_params = {name: param for name, param in model.named_parameters()}
+    # named_params = {name: param for name, param in model.named_parameters()}
+    named_params = dict(model.named_parameters())
 
     optimizer = SparseSGDM(
         model.parameters(), named_params=named_params, grad_mask=mask, lr=0.01
