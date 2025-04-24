@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 from torch.utils.data import Dataset
 
-from utils.model_utils import save_checkpoint, iid_sharding, non_iid_sharding
+from utils.model_utils import save_checkpoint, iid_sharding, non_iid_sharding, non_iid_dirichlet
 
 
 class SimpleDataset(Dataset):
@@ -114,3 +114,33 @@ def test_non_iid_reproducibility(ternary_dataset):
     assert (
         shard_data_1 == shard_data_2
     ), "Sharding results are not reproducible with the same seed"
+
+def test_non_idd_dirichlet_reproducibility(ternary_dataset):
+    """Tests if the function produces identical results with the same seed."""
+    num_clients = 4
+    num_classes = 3
+    alpha = 0.1 # Use a smaller alpha for potentially higher non-IID
+    seed = 42
+
+    # Run first time
+    client_data_1 = non_iid_dirichlet(
+        dataset=ternary_dataset,
+        num_clients=num_clients,
+        num_classes=num_classes,
+        alpha=alpha,
+        seed=seed
+    )
+
+    # Run second time with identical parameters
+    client_data_2 = non_iid_dirichlet(
+        dataset=ternary_dataset,
+        num_clients=num_clients,
+        num_classes=num_classes,
+        alpha=alpha,
+        seed=seed
+    )
+
+    # Assert that the resulting dictionaries are identical
+    # This works because the final shuffle within each client list is also seeded.
+    assert client_data_1 == client_data_2, \
+        "non_iid_dirichlet results are not reproducible with the same seed"
