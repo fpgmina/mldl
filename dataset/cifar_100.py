@@ -1,16 +1,12 @@
 from typing import List, Tuple, Optional
 
 import torch
-import torchvision
 import torchvision.transforms as transforms
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset
 
-from utils.model_utils import iid_sharding, non_iid_sharding
 
-import torchvision.transforms as transforms
 from torchvision.datasets import CIFAR100
-from torch.utils.data import DataLoader, Subset
-import torch
+from torch.utils.data import Subset
 import numpy as np
 
 
