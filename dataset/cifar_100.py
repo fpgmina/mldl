@@ -7,6 +7,16 @@ from torch.utils.data import DataLoader, Dataset, random_split
 
 from utils.model_utils import iid_sharding, non_iid_sharding
 
+import torchvision.transforms as transforms
+from torchvision.datasets import CIFAR100
+from torch.utils.data import DataLoader, Subset
+import torch
+import numpy as np
+
+
+IMAGENET_MEAN = (0.485, 0.456, 0.406)
+IMAGENET_STD = (0.229, 0.224, 0.225)
+
 
 def get_train_transform():
     transform = transforms.Compose(
@@ -18,13 +28,13 @@ def get_train_transform():
             # Imagenet normalization
             # DINO model has learned features from ImageNet, so during fine-tuning on CIFAR-100,
             # the model will expect inputs to be normalized in the same way as during pretraining.
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
         ]
     )
     return transform
 
 
-def get_test_tranform():
+def get_val_test_tranform():
     transform = transforms.Compose(
         [
             transforms.Resize(224),  # resize to 224 x 224 (required by ViT)
@@ -32,34 +42,36 @@ def get_test_tranform():
             # Imagenet normalization
             # DINO model has learned features from ImageNet, so during fine-tuning on CIFAR-100,
             # the model will expect inputs to be normalized in the same way as during pretraining.
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
         ]
     )
     return transform
 
 
-def get_cifar_100_datasets() -> Tuple[Dataset, Dataset]:
+def get_cifar_100_datasets(seed: int = 42) -> Tuple[Dataset, Dataset, Dataset]:
+    rng = np.random.default_rng(seed=seed)
     train_transform = get_train_transform()
-    test_transform = get_test_tranform()
-    trainset = torchvision.datasets.CIFAR100(
-        root="./data", train=True, download=True, transform=train_transform
-    )
-    testset = torchvision.datasets.CIFAR100(
-        root="./data", train=False, download=True, transform=test_transform
-    )
-    return trainset, testset
+    val_test_transform = get_val_test_tranform()
 
+    full_train_dataset = CIFAR100(root="./data", train=True, download=True)
+    test_dataset = CIFAR100(root="./data", train=False, transform=val_test_transform)
 
-def get_cifar_100_train_valset_datasets(
-    dataset: Dataset, seed: int = 42
-) -> Tuple[Dataset, Dataset]:
-    data_size = len(dataset)  # type: ignore
-    train_size = int(0.8 * data_size)  # 80pc train, 20pc validation
-    val_size = data_size - train_size
-    trainset, valset = random_split(
-        dataset, [train_size, val_size], generator=torch.Generator().manual_seed(seed)
-    )
-    return trainset, valset
+    # Create train/val split indices
+    len_train = len(full_train_dataset)
+    indices = list(range(len_train))
+    split = int(0.8 * len_train)
+
+    rng.shuffle(indices)
+
+    train_indices, val_indices = indices[:split], indices[split:]
+
+    train_dataset = CIFAR100(root="./data", train=True, transform=train_transform)
+    val_dataset = CIFAR100(root="./data", train=True, transform=val_test_transform)
+
+    train_dataset = Subset(train_dataset, train_indices)
+    val_dataset = Subset(val_dataset, val_indices)
+
+    return train_dataset, val_dataset, test_dataset
 
 
 def get_dataloader(
@@ -90,27 +102,8 @@ def get_dataloader(
 
 
 def get_cifar_dataloaders(batch_size=None):
-    trainset, _ = get_cifar_100_datasets()
-    trainset, valset = get_cifar_100_train_valset_datasets(trainset)
+    trainset, valset, _ = get_cifar_100_datasets()
     train_dataloader, val_dataloader = get_dataloader(
         trainset, batch_size=batch_size
-    ), get_dataloader(valset, batch_size=batch_size)
+    ), get_dataloader(valset, batch_size=batch_size, shuffle=False)
     return train_dataloader, val_dataloader
-
-
-if __name__ == "__main__":
-
-    K = 10  # Number of clients
-    num_classes = 2  # Number of classes per client (non iid)
-
-    train_set, _ = get_cifar_100_datasets()
-    trainset, valset = get_cifar_100_train_valset_datasets(train_set)
-
-    iid_client_data = iid_sharding(trainset, K)
-    non_iid_client_data = non_iid_sharding(trainset, K, num_classes)
-
-    client_0_iid_loader = get_dataloader(trainset, iid_client_data[0], shuffle=True)
-    client_0_non_iid_data = get_dataloader(
-        trainset, non_iid_client_data[0], shuffle=True
-    )
-    val_loader = DataLoader(valset, batch_size=32, shuffle=False)
