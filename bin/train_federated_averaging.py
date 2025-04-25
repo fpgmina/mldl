@@ -4,14 +4,14 @@ from core.federated_averaging import FederatedAveraging, ShardingType
 from core.train_params import TrainingParams
 from dataset.cifar_100 import (
     get_cifar_dataloaders,
-    get_cifar_100_datasets,
+    get_cifar_datasets,
 )
 from models.dino_backbone import get_dino_backbone_model
 
 if __name__ == "__main__":
     train_dataloader, val_dataloader = get_cifar_dataloaders(batch_size=32)
     model = get_dino_backbone_model()
-    trainset, valset, _ = get_cifar_100_datasets()
+    trainset, valset, _ = get_cifar_datasets()
 
     client_training_params = TrainingParams(
         training_name="fl_client_training_params",

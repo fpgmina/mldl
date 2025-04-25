@@ -44,7 +44,7 @@ def get_val_test_tranform():
     return transform
 
 
-def get_cifar_100_datasets(seed: int = 42) -> Tuple[Dataset, Dataset, Dataset]:
+def get_cifar_datasets(seed: int = 42) -> Tuple[Dataset, Dataset, Dataset]:
     rng = np.random.default_rng(seed=seed)
     train_transform = get_train_transform()
     val_test_transform = get_val_test_tranform()
@@ -98,7 +98,7 @@ def get_dataloader(
 
 
 def get_cifar_dataloaders(batch_size=None):
-    trainset, valset, _ = get_cifar_100_datasets()
+    trainset, valset, _ = get_cifar_datasets()
     train_dataloader, val_dataloader = get_dataloader(
         trainset, batch_size=batch_size
     ), get_dataloader(valset, batch_size=batch_size, shuffle=False)
