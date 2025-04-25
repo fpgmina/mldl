@@ -18,7 +18,6 @@ def get_train_transform():
             # Imagenet normalization
             # DINO model has learned features from ImageNet, so during fine-tuning on CIFAR-100,
             # the model will expect inputs to be normalized in the same way as during pretraining.
-            # TODO check this is correct
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
     )
@@ -33,7 +32,6 @@ def get_test_tranform():
             # Imagenet normalization
             # DINO model has learned features from ImageNet, so during fine-tuning on CIFAR-100,
             # the model will expect inputs to be normalized in the same way as during pretraining.
-            # TODO check this is correct
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
     )
@@ -78,7 +76,8 @@ def get_dataloader(
         indices (List[int], optional): A list of indices to create a subset of the dataset. If None, the entire dataset is used. Defaults to None.
         batch_size (int, optional): The number of samples per batch. Defaults to None.
         shuffle (bool, optional): Whether to shuffle the data at the beginning of each epoch. Defaults to True.
-            NB Should be set to False for test dataset and to True for train/val datasets.
+            NB Should be set to False for test/val dataset and to True for train datasets as in general we do not want
+            any testing procedure to be non-deterministic.
 
     Returns:
         DataLoader: A DataLoader for the given dataset, potentially using a subset of the data.
