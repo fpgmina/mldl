@@ -10,7 +10,7 @@ from utils.model_utils import get_device
 if __name__ == "__main__":
 
     # Path to validation set
-    IMAGENET100_VAL_DIR = "/content/imagenet100/val"
+    IMAGENET100_VAL_DIR = "/content/drive/MyDrive/datasets/imagenet100/val/"
 
     transform = transforms.Compose(
         [
