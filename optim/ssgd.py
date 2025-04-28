@@ -13,15 +13,16 @@ class SparseSGDM(SGD):
     a subset of parameters (e.g. those selected by Fisher Information) are allowed to update.
 
     Args:
-        named_params (Dict[str, torch.nn.Parameter]): Dictionary mapping parameter names
-            to their corresponding tensors. Used to match parameters to their gradient masks.
-        grad_mask (Dict[str, torch.Tensor]): Dictionary mapping parameter names to binary masks
-            of the same shape. A value of 1 allows gradient updates; 0 freezes the parameter.
+        params (Iterable[nn.Parameters]): Iterable of parameters to be optimized.
         lr (float): Learning rate.
         momentum (float): Momentum factor.
         dampening (float): Dampening for momentum.
         weight_decay (float): Weight decay (L2 penalty).
         nesterov (bool): Enables Nesterov momentum.
+        named_params (Dict[str, torch.nn.Parameter]): Dictionary mapping parameter names
+            to their corresponding tensors. Used to match parameters to their gradient masks.
+        grad_mask (Dict[str, torch.Tensor]): Dictionary mapping parameter names to binary masks
+            of the same shape. A value of 1 allows gradient updates; 0 freezes the parameter.
 
     Example:
         >>> optimizer = SparseSGDM(named_params, grad_mask, lr=0.01)
