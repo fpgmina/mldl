@@ -169,7 +169,26 @@ def non_iid_dirichlet(
     alpha: Optional[int] = 0.5,
     seed: int = 42,
 ):
-
+    
+    """
+    Partition a dataset among clients using a Dirichlet distribution to create a non-IID (non-Independent and Identically Distributed) data split.
+    
+    This function divides data points by class and then allocates them to clients according to proportions
+    drawn from a Dirichlet distribution. Lower alpha values create more heterogeneous (non-IID) splits,
+    while higher alpha values create more uniform distributions across clients.
+    
+    Parameters:
+        dataset (Dataset): The dataset to partition, should be iterable and yield (data, label) tuples.
+        num_clients (int): Number of clients to partition the data among.
+        num_classes (int): Total number of classes in the dataset.
+        alpha (Optional[int]): Concentration parameter for the Dirichlet distribution. Default is 0.5.
+                              Lower values create more non-IID splits, higher values create more balanced splits.
+        seed (int): Random seed for reproducibility. Default is 42.
+    
+    Returns:
+        dict: A dictionary mapping client indices to lists of dataset indices assigned to each client.
+    """
+    
     rng = np.random.default_rng(seed=seed)
     client_data = {i: [] for i in range(num_clients)}
 
