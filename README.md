@@ -32,6 +32,13 @@ Found under `models/`.
 
 ---
 
+## Optim Modules
+
+Implementation of custom optimizers, e.g. SparseSGD.
+Found under `optim/`.
+
+---
+
 ## 📂 Dataset Modules
 
 Provides standardized **PyTorch-style dataloaders** for various common datasets.  
